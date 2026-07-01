@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'register_screen.dart';
+import 'forgot_password_screen.dart';
+import '../dashboard/dashboard_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -7,6 +10,7 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -14,7 +18,6 @@ class LoginScreen extends StatelessWidget {
             children: [
               const SizedBox(height: 60),
 
-              // Logo
               Image.asset('assets/images/logo.png', width: 80),
 
               const SizedBox(height: 15),
@@ -56,7 +59,15 @@ class LoginScreen extends StatelessWidget {
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const ForgotPasswordScreen(),
+                      ),
+                    );
+                  },
+
                   child: const Text(
                     "Forgot Password?",
                     style: TextStyle(color: Color(0xff0C9E6E), fontSize: 16),
@@ -69,15 +80,24 @@ class LoginScreen extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 height: 60,
+
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const DashboardScreen(),
+                      ),
+                    );
+                  },
+
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xff0C9E6E),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(35),
                     ),
-                    elevation: 10,
                   ),
+
                   child: const Text(
                     "Login",
                     style: TextStyle(fontSize: 22, color: Colors.white),
@@ -97,20 +117,30 @@ class LoginScreen extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 height: 60,
+
                 child: OutlinedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                    );
+                  },
+
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: Color(0xff0C9E6E), width: 2),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(35),
                     ),
                   ),
+
                   child: const Text(
                     "Register",
                     style: TextStyle(color: Color(0xff0C9E6E), fontSize: 22),
                   ),
                 ),
               ),
+
+              const SizedBox(height: 40),
             ],
           ),
         ),
@@ -127,15 +157,21 @@ class LoginScreen extends StatelessWidget {
       obscureText: obscure,
       decoration: InputDecoration(
         prefixIcon: Icon(icon, color: const Color(0xff93A4BF)),
+
         hintText: hint,
+
         hintStyle: const TextStyle(color: Color(0xff93A4BF)),
+
         filled: true,
         fillColor: const Color(0xffF7F9FC),
+
         contentPadding: const EdgeInsets.symmetric(vertical: 22),
+
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(35),
           borderSide: const BorderSide(color: Color(0xffDCE3EE)),
         ),
+
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(35),
           borderSide: const BorderSide(color: Color(0xff0C9E6E), width: 2),
