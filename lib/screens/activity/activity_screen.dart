@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../widgets/bottom_navbar.dart';
 
+import '../dashboard/dashboard_screen.dart';
+import '../water/water_screen.dart';
+import '../statistics/statistics_screen.dart';
+
 class ActivityScreen extends StatefulWidget {
   const ActivityScreen({super.key});
 
@@ -489,15 +493,28 @@ class _ActivityScreenState extends State<ActivityScreen> {
         onTap: (index) {
           switch (index) {
             case 0:
-              Navigator.pop(context);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const DashboardScreen()),
+              );
               break;
+
             case 1:
+              // Sudah di Activity
               break;
+
             case 2:
-              // Navigator.push(...)
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const WaterScreen()),
+              );
               break;
+
             case 3:
-              // Navigator.push(...)
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const StatisticsScreen()),
+              );
               break;
           }
         },

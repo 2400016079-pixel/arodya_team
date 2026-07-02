@@ -1,5 +1,10 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import '../../widgets/bottom_navbar.dart';
+
+import '../dashboard/dashboard_screen.dart';
+import '../activity/activity_screen.dart';
+import '../statistics/statistics_screen.dart';
 
 class WaterEntry {
   final int amount;
@@ -39,10 +44,7 @@ class _WaterScreenState extends State<WaterScreen> {
 
   void _addWater() {
     setState(() {
-      _history.insert(
-        0,
-        WaterEntry(amount: addAmount, time: TimeOfDay.now()),
-      );
+      _history.insert(0, WaterEntry(amount: addAmount, time: TimeOfDay.now()));
     });
   }
 
@@ -208,7 +210,37 @@ class _WaterScreenState extends State<WaterScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: const _BottomNavBar(),
+      bottomNavigationBar: BottomNavbar(
+        currentIndex: 2,
+        onTap: (index) {
+          switch (index) {
+            case 0:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const DashboardScreen()),
+              );
+              break;
+
+            case 1:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const ActivityScreen()),
+              );
+              break;
+
+            case 2:
+              // Sudah di Water
+              break;
+
+            case 3:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const StatisticsScreen()),
+              );
+              break;
+          }
+        },
+      ),
     );
   }
 }
@@ -305,82 +337,5 @@ class _ProgressRingPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _ProgressRingPainter oldDelegate) {
     return oldDelegate.percent != percent;
-  }
-}
-
-class _BottomNavBar extends StatelessWidget {
-  const _BottomNavBar();
-
-  @override
-  Widget build(BuildContext context) {
-    return BottomAppBar(
-      color: Colors.white,
-      elevation: 8,
-      child: SizedBox(
-        height: 70,
-        child: Row(
-          children: [
-            _NavItem(icon: Icons.home_outlined, label: 'Home'),
-            _NavItem(icon: Icons.fitness_center_outlined, label: 'Activity'),
-            _NavItem(
-              icon: Icons.local_drink,
-              label: 'Water',
-              isActive: true,
-            ),
-            _NavItem(icon: Icons.bar_chart_outlined, label: 'Stats'),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _NavItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool isActive;
-
-  const _NavItem({
-    required this.icon,
-    required this.label,
-    this.isActive = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    const activeColor = Color(0xFF1E8E3E);
-
-    return Expanded(
-      child: InkWell(
-        onTap: () {},
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (isActive)
-              Container(
-                width: 52,
-                height: 52,
-                margin: const EdgeInsets.only(bottom: 4),
-                decoration: const BoxDecoration(
-                  color: activeColor,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(icon, color: Colors.white, size: 22),
-              )
-            else
-              Icon(icon, color: Colors.black54, size: 22),
-            if (!isActive) const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                color: isActive ? activeColor : Colors.black54,
-                fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

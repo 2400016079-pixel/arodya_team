@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../services/auth_service.dart';
 import '../dashboard/dashboard_screen.dart';
+import 'forgot_password_screen.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -20,6 +21,13 @@ class _LoginScreenState extends State<LoginScreen> {
   bool loading = false;
 
   @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
@@ -30,8 +38,10 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               const SizedBox(height: 60),
 
-              // Logo
-              Image.asset('assets/images/logo.png', width: 80),
+              Image.asset(
+                'assets/images/logo.png',
+                width: 80,
+              ),
 
               const SizedBox(height: 15),
 
@@ -58,8 +68,8 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 55),
 
               _textField(
-                hint: "Email", 
-                icon: Icons.email_outlined, 
+                hint: "Email",
+                icon: Icons.email_outlined,
                 controller: emailController,
               ),
 
@@ -69,17 +79,28 @@ class _LoginScreenState extends State<LoginScreen> {
                 hint: "Password",
                 icon: Icons.lock_outline,
                 controller: passwordController,
-                obscure: true,),
+                obscure: true,
+              ),
 
               const SizedBox(height: 12),
 
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const ForgotPasswordScreen(),
+                      ),
+                    );
+                  },
                   child: const Text(
                     "Forgot Password?",
-                    style: TextStyle(color: Color(0xff0C9E6E), fontSize: 16),
+                    style: TextStyle(
+                      color: Color(0xff0C9E6E),
+                      fontSize: 16,
+                    ),
                   ),
                 ),
               ),
@@ -90,63 +111,68 @@ class _LoginScreenState extends State<LoginScreen> {
                 width: double.infinity,
                 height: 60,
                 child: ElevatedButton(
-  onPressed: loading
-      ? null
-      : () async {
-          setState(() {
-            loading = true;
-          });
+                  onPressed: loading
+                      ? null
+                      : () async {
+                          setState(() {
+                            loading = true;
+                          });
 
-          final result = await _auth.login(
-            email: emailController.text.trim(),
-            password: passwordController.text.trim(),
-          );
+                          final result = await _auth.login(
+                            email: emailController.text.trim(),
+                            password: passwordController.text.trim(),
+                          );
 
-          setState(() {
-            loading = false;
-          });
+                          if (!mounted) return;
 
-          if (!mounted) return;
+                          setState(() {
+                            loading = false;
+                          });
 
-          if (result == null) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const DashboardScreen(),
-              ),
-            );
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(result)),
-            );
-          }
-        },
-  style: ElevatedButton.styleFrom(
-    backgroundColor: const Color(0xff0C9E6E),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(35),
-    ),
-    elevation: 10,
-  ),
-  child: loading
-      ? const CircularProgressIndicator(
-          color: Colors.white,
-        )
-      : const Text(
-          "Login",
-          style: TextStyle(
-            fontSize: 22,
-            color: Colors.white,
-          ),
-        ),
-),
+                          if (result == null) {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const DashboardScreen(),
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(result),
+                              ),
+                            );
+                          }
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xff0C9E6E),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(35),
+                    ),
+                    elevation: 10,
+                  ),
+                  child: loading
+                      ? const CircularProgressIndicator(
+                          color: Colors.white,
+                        )
+                      : const Text(
+                          "Login",
+                          style: TextStyle(
+                            fontSize: 22,
+                            color: Colors.white,
+                          ),
+                        ),
+                ),
               ),
 
               const SizedBox(height: 55),
 
               const Text(
                 "Belum punya akun?",
-                style: TextStyle(color: Color(0xff6B7C99), fontSize: 18),
+                style: TextStyle(
+                  color: Color(0xff6B7C99),
+                  fontSize: 18,
+                ),
               ),
 
               const SizedBox(height: 20),
@@ -155,29 +181,34 @@ class _LoginScreenState extends State<LoginScreen> {
                 width: double.infinity,
                 height: 60,
                 child: OutlinedButton(
-  onPressed: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const RegisterScreen(),
-      ),
-    );
-  },
-  style: OutlinedButton.styleFrom(
-    side: const BorderSide(color: Color(0xff0C9E6E), width: 2),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(35),
-    ),
-  ),
-  child: const Text(
-    "Register",
-    style: TextStyle(
-      color: Color(0xff0C9E6E),
-      fontSize: 22,
-    ),
-  ),
-),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const RegisterScreen(),
+                      ),
+                    );
+                  },
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(
+                      color: Color(0xff0C9E6E),
+                      width: 2,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(35),
+                    ),
+                  ),
+                  child: const Text(
+                    "Register",
+                    style: TextStyle(
+                      color: Color(0xff0C9E6E),
+                      fontSize: 22,
+                    ),
+                  ),
+                ),
               ),
+
+              const SizedBox(height: 40),
             ],
           ),
         ),
@@ -186,30 +217,42 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _textField({
-  required String hint,
-  required IconData icon,
-  required TextEditingController controller,
-  bool obscure = false,
+    required String hint,
+    required IconData icon,
+    required TextEditingController controller,
+    bool obscure = false,
   }) {
-  return TextField(
-    controller: controller,
-    obscureText: obscure,
-    decoration: InputDecoration(
-      prefixIcon: Icon(icon, color: const Color(0xff93A4BF)),
-      hintText: hint,
-      hintStyle: const TextStyle(color: Color(0xff93A4BF)),
-      filled: true,
-      fillColor: const Color(0xffF7F9FC),
-      contentPadding: const EdgeInsets.symmetric(vertical: 22),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(35),
-        borderSide: const BorderSide(color: Color(0xffDCE3EE)),
+    return TextField(
+      controller: controller,
+      obscureText: obscure,
+      decoration: InputDecoration(
+        prefixIcon: Icon(
+          icon,
+          color: const Color(0xff93A4BF),
+        ),
+        hintText: hint,
+        hintStyle: const TextStyle(
+          color: Color(0xff93A4BF),
+        ),
+        filled: true,
+        fillColor: const Color(0xffF7F9FC),
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 22,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(35),
+          borderSide: const BorderSide(
+            color: Color(0xffDCE3EE),
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(35),
+          borderSide: const BorderSide(
+            color: Color(0xff0C9E6E),
+            width: 2,
+          ),
+        ),
       ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(35),
-        borderSide: const BorderSide(color: Color(0xff0C9E6E), width: 2),
-      ),
-    ),
-  );
+    );
   }
 }

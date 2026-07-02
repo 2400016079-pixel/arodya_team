@@ -24,7 +24,7 @@ class SplashScreen extends StatelessWidget {
                 const Spacer(flex: 2),
 
                 // Logo
-                Image.asset('lib/assets/images/logo.png', width: 110),
+                Image.asset('assets/images/logo.png', width: 110),
 
                 const SizedBox(height: 15),
 
