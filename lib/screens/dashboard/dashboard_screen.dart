@@ -3,6 +3,12 @@ import '../../widgets/menu_card.dart';
 import '../../widgets/summary_card.dart';
 import '../../widgets/bottom_navbar.dart';
 
+import '../activity/activity_screen.dart';
+import '../water/water_screen.dart';
+import '../mood/mood_screen.dart';
+import '../history/history_screen.dart';
+import '../statistics/statistics_screen.dart';
+
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
 
@@ -17,12 +23,9 @@ class DashboardScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               // ================= HEADER =================
-
               Row(
                 children: [
-
                   CircleAvatar(
                     radius: 28,
                     backgroundColor: const Color(0xffDDF5E8),
@@ -39,9 +42,8 @@ class DashboardScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-
                         Text(
-                          "Halo, Rara 👋",
+                          "Selamat Datang 👋",
                           style: TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.bold,
@@ -52,10 +54,7 @@ class DashboardScreen extends StatelessWidget {
 
                         Text(
                           "Selamat datang di ZenFit",
-                          style: TextStyle(
-                            color: Colors.black54,
-                            fontSize: 16,
-                          ),
+                          style: TextStyle(color: Colors.black54, fontSize: 16),
                         ),
                       ],
                     ),
@@ -68,12 +67,9 @@ class DashboardScreen extends StatelessWidget {
                     ),
                     child: IconButton(
                       onPressed: () {},
-                      icon: const Icon(
-                        Icons.notifications_none,
-                        size: 30,
-                      ),
+                      icon: const Icon(Icons.notifications_none, size: 30),
                     ),
-                  )
+                  ),
                 ],
               ),
 
@@ -81,10 +77,7 @@ class DashboardScreen extends StatelessWidget {
 
               const Text(
                 "Ringkasan Hari Ini",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
 
               const SizedBox(height: 20),
@@ -105,6 +98,8 @@ class DashboardScreen extends StatelessWidget {
                 ),
               ),
 
+              const SizedBox(height: 15),
+
               SummaryCard(
                 icon: Icons.sentiment_satisfied_alt,
                 iconColor: Colors.amber,
@@ -113,6 +108,8 @@ class DashboardScreen extends StatelessWidget {
                 value: "Senang 😊",
                 subtitle: "Tetap semangat!",
               ),
+
+              const SizedBox(height: 15),
 
               SummaryCard(
                 icon: Icons.directions_run,
@@ -127,10 +124,7 @@ class DashboardScreen extends StatelessWidget {
 
               const Text(
                 "Menu Utama",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
 
               const SizedBox(height: 20),
@@ -140,7 +134,6 @@ class DashboardScreen extends StatelessWidget {
                 runSpacing: 16,
                 alignment: WrapAlignment.spaceBetween,
                 children: [
-
                   MenuCard(
                     icon: Icons.directions_run,
                     title: "Activity\nTracker",
@@ -148,7 +141,14 @@ class DashboardScreen extends StatelessWidget {
                     borderColor: const Color(0xff39D67C),
                     iconColor: Colors.white,
                     textColor: Colors.white,
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ActivityScreen(),
+                        ),
+                      );
+                    },
                   ),
 
                   MenuCard(
@@ -158,7 +158,14 @@ class DashboardScreen extends StatelessWidget {
                     borderColor: const Color(0xff2196F3),
                     iconColor: Colors.blue,
                     textColor: Colors.black,
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const WaterScreen(),
+                        ),
+                      );
+                    },
                   ),
 
                   MenuCard(
@@ -168,7 +175,14 @@ class DashboardScreen extends StatelessWidget {
                     borderColor: const Color(0xffFFD54F),
                     iconColor: Colors.amber,
                     textColor: Colors.black,
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const MoodScreen(),
+                        ),
+                      );
+                    },
                   ),
 
                   MenuCard(
@@ -178,7 +192,14 @@ class DashboardScreen extends StatelessWidget {
                     borderColor: const Color(0xff8A63FF),
                     iconColor: const Color(0xff8A63FF),
                     textColor: Colors.black,
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const HistoryScreen(),
+                        ),
+                      );
+                    },
                   ),
 
                   MenuCard(
@@ -188,7 +209,14 @@ class DashboardScreen extends StatelessWidget {
                     borderColor: const Color(0xff4A90E2),
                     iconColor: const Color(0xff4A90E2),
                     textColor: Colors.black,
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const StatisticsScreen(),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -204,15 +232,30 @@ class DashboardScreen extends StatelessWidget {
         onTap: (index) {
           switch (index) {
             case 0:
+              // Sudah di Dashboard
               break;
+
             case 1:
-              // Navigator.push(...)
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const ActivityScreen()),
+              );
               break;
+
             case 2:
-              // Navigator.push(...)
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const WaterScreen()),
+              );
               break;
+
             case 3:
-              // Navigator.push(...)
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const StatisticsScreen(),
+                ),
+              );
               break;
           }
         },
