@@ -1,7 +1,23 @@
 import 'package:flutter/material.dart';
 
-class LoginScreen extends StatelessWidget {
+import '../../services/auth_service.dart';
+import '../dashboard/dashboard_screen.dart';
+import 'register_screen.dart';
+
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final AuthService _auth = AuthService();
+
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  bool loading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -41,15 +57,19 @@ class LoginScreen extends StatelessWidget {
 
               const SizedBox(height: 55),
 
-              _textField(hint: "Email", icon: Icons.email_outlined),
+              _textField(
+                hint: "Email", 
+                icon: Icons.email_outlined, 
+                controller: emailController,
+              ),
 
               const SizedBox(height: 22),
 
               _textField(
                 hint: "Password",
                 icon: Icons.lock_outline,
-                obscure: true,
-              ),
+                controller: passwordController,
+                obscure: true,),
 
               const SizedBox(height: 12),
 
@@ -70,19 +90,56 @@ class LoginScreen extends StatelessWidget {
                 width: double.infinity,
                 height: 60,
                 child: ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xff0C9E6E),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(35),
-                    ),
-                    elevation: 10,
-                  ),
-                  child: const Text(
-                    "Login",
-                    style: TextStyle(fontSize: 22, color: Colors.white),
-                  ),
-                ),
+  onPressed: loading
+      ? null
+      : () async {
+          setState(() {
+            loading = true;
+          });
+
+          final result = await _auth.login(
+            email: emailController.text.trim(),
+            password: passwordController.text.trim(),
+          );
+
+          setState(() {
+            loading = false;
+          });
+
+          if (!mounted) return;
+
+          if (result == null) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const DashboardScreen(),
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(result)),
+            );
+          }
+        },
+  style: ElevatedButton.styleFrom(
+    backgroundColor: const Color(0xff0C9E6E),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(35),
+    ),
+    elevation: 10,
+  ),
+  child: loading
+      ? const CircularProgressIndicator(
+          color: Colors.white,
+        )
+      : const Text(
+          "Login",
+          style: TextStyle(
+            fontSize: 22,
+            color: Colors.white,
+          ),
+        ),
+),
               ),
 
               const SizedBox(height: 55),
@@ -98,18 +155,28 @@ class LoginScreen extends StatelessWidget {
                 width: double.infinity,
                 height: 60,
                 child: OutlinedButton(
-                  onPressed: () {},
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0xff0C9E6E), width: 2),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(35),
-                    ),
-                  ),
-                  child: const Text(
-                    "Register",
-                    style: TextStyle(color: Color(0xff0C9E6E), fontSize: 22),
-                  ),
-                ),
+  onPressed: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const RegisterScreen(),
+      ),
+    );
+  },
+  style: OutlinedButton.styleFrom(
+    side: const BorderSide(color: Color(0xff0C9E6E), width: 2),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(35),
+    ),
+  ),
+  child: const Text(
+    "Register",
+    style: TextStyle(
+      color: Color(0xff0C9E6E),
+      fontSize: 22,
+    ),
+  ),
+),
               ),
             ],
           ),
@@ -119,28 +186,30 @@ class LoginScreen extends StatelessWidget {
   }
 
   Widget _textField({
-    required String hint,
-    required IconData icon,
-    bool obscure = false,
+  required String hint,
+  required IconData icon,
+  required TextEditingController controller,
+  bool obscure = false,
   }) {
-    return TextField(
-      obscureText: obscure,
-      decoration: InputDecoration(
-        prefixIcon: Icon(icon, color: const Color(0xff93A4BF)),
-        hintText: hint,
-        hintStyle: const TextStyle(color: Color(0xff93A4BF)),
-        filled: true,
-        fillColor: const Color(0xffF7F9FC),
-        contentPadding: const EdgeInsets.symmetric(vertical: 22),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(35),
-          borderSide: const BorderSide(color: Color(0xffDCE3EE)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(35),
-          borderSide: const BorderSide(color: Color(0xff0C9E6E), width: 2),
-        ),
+  return TextField(
+    controller: controller,
+    obscureText: obscure,
+    decoration: InputDecoration(
+      prefixIcon: Icon(icon, color: const Color(0xff93A4BF)),
+      hintText: hint,
+      hintStyle: const TextStyle(color: Color(0xff93A4BF)),
+      filled: true,
+      fillColor: const Color(0xffF7F9FC),
+      contentPadding: const EdgeInsets.symmetric(vertical: 22),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(35),
+        borderSide: const BorderSide(color: Color(0xffDCE3EE)),
       ),
-    );
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(35),
+        borderSide: const BorderSide(color: Color(0xff0C9E6E), width: 2),
+      ),
+    ),
+  );
   }
 }

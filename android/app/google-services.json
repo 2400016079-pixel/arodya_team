@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "76387988997",
+    "project_id": "zenfit-62b35",
+    "storage_bucket": "zenfit-62b35.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:76387988997:android:36f4a26ad4f87945ce4e6c",
+        "android_client_info": {
+          "package_name": "com.example.zenfit"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKIr-2R62gUsIgiVYCW5UubTBdC8a0rVY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
