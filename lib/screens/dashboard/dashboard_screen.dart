@@ -5,6 +5,9 @@ import '../../widgets/dashboard_card.dart';
 import '../../widgets/history_tile.dart';
 import '../../widgets/weekly_bar.dart';
 import '../water/add_drink_screen.dart';
+import '../activity/activity_screen.dart';
+import '../water/water_screen.dart';
+import '../statistics/statistics_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -31,27 +34,39 @@ class DashboardScreen extends StatelessWidget {
                   Navigator.pop(context);
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const AddDrinkScreen()),
+                    MaterialPageRoute(
+                      builder: (context) => const AddDrinkScreen(),
+                    ),
                   );
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.directions_run, color: Color(0xff35694A)),
+                leading: const Icon(
+                  Icons.directions_run,
+                  color: Color(0xff35694A),
+                ),
                 title: const Text("Log Activity"),
                 onTap: () {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Activity logging screen not built yet")),
+                    const SnackBar(
+                      content: Text("Activity logging screen not built yet"),
+                    ),
                   );
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.sentiment_satisfied, color: Color(0xff35694A)),
+                leading: const Icon(
+                  Icons.sentiment_satisfied,
+                  color: Color(0xff35694A),
+                ),
                 title: const Text("Log Mood"),
                 onTap: () {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Mood logging screen not built yet")),
+                    const SnackBar(
+                      content: Text("Mood logging screen not built yet"),
+                    ),
                   );
                 },
               ),
@@ -70,10 +85,7 @@ class DashboardScreen extends StatelessWidget {
 
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 22,
-            vertical: 20,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -81,10 +93,7 @@ class DashboardScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Icon(
-                    Icons.person_outline,
-                    size: 32,
-                  ),
+                  const Icon(Icons.person_outline, size: 32),
                   Row(
                     children: [
                       Container(
@@ -110,10 +119,7 @@ class DashboardScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const Icon(
-                    Icons.notifications_none,
-                    size: 32,
-                  ),
+                  const Icon(Icons.notifications_none, size: 32),
                 ],
               ),
 
@@ -132,10 +138,7 @@ class DashboardScreen extends StatelessWidget {
 
               const Text(
                 "Your daily wellness summary is ready.",
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.black54,
-                ),
+                style: TextStyle(fontSize: 18, color: Colors.black54),
               ),
 
               const SizedBox(height: 35),
@@ -158,27 +161,15 @@ class DashboardScreen extends StatelessWidget {
                         value: .48,
                         minHeight: 10,
                         backgroundColor: Colors.white,
-                        valueColor: AlwaysStoppedAnimation(
-                          Color(0xff2C6C72),
-                        ),
+                        valueColor: AlwaysStoppedAnimation(Color(0xff2C6C72)),
                       ),
                     ),
                     const SizedBox(height: 12),
                     const Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          "0 L",
-                          style: TextStyle(
-                            color: Colors.black54,
-                          ),
-                        ),
-                        Text(
-                          "2.5 L",
-                          style: TextStyle(
-                            color: Colors.black54,
-                          ),
-                        ),
+                        Text("0 L", style: TextStyle(color: Colors.black54)),
+                        Text("2.5 L", style: TextStyle(color: Colors.black54)),
                       ],
                     ),
                   ],
@@ -218,10 +209,7 @@ class DashboardScreen extends StatelessWidget {
               //================ HISTORY =================
               const Text(
                 "History Activity",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
 
               const SizedBox(height: 18),
@@ -267,10 +255,7 @@ class DashboardScreen extends StatelessWidget {
               //================ WEEKLY STATISTICS =================
               const Text(
                 "Weekly Statistics",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
 
               const SizedBox(height: 25),
@@ -306,16 +291,10 @@ class DashboardScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(24),
                     ),
                   ),
-                  icon: const Icon(
-                    Icons.add,
-                    color: Colors.white,
-                  ),
+                  icon: const Icon(Icons.add, color: Colors.white),
                   label: const Text(
                     "New Activity",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                    ),
+                    style: TextStyle(color: Colors.white, fontSize: 18),
                   ),
                 ),
               ),
@@ -329,15 +308,38 @@ class DashboardScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xff35694A),
         onPressed: () => _openQuickAddSheet(context),
-        child: const Icon(
-          Icons.add,
-          color: Colors.white,
-        ),
+        child: const Icon(Icons.add, color: Colors.white),
       ),
 
       bottomNavigationBar: BottomNavbar(
         currentIndex: 0,
-        onTap: (index) {},
+        onTap: (index) {
+          switch (index) {
+            case 0:
+              break;
+
+            case 1:
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ActivityScreen()),
+              );
+              break;
+
+            case 2:
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const WaterScreen()),
+              );
+              break;
+
+            case 3:
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const StatisticsScreen()),
+              );
+              break;
+          }
+        },
       ),
     );
   }
