@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../widgets/menu_card.dart';
 import '../../widgets/summary_card.dart';
 import '../../widgets/bottom_navbar.dart';
 
 import '../activity/activity_screen.dart';
+import '../../services/auth_service.dart';
+import '../auth/login_screen.dart';
 import '../water/water_screen.dart';
 import '../mood/mood_screen.dart';
 import '../history/history_screen.dart';
 import '../statistics/statistics_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({super.key});
+  DashboardScreen({super.key});
+
+  final User? user = FirebaseAuth.instance.currentUser;
+  final AuthService _auth = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -38,40 +44,61 @@ class DashboardScreen extends StatelessWidget {
 
                   const SizedBox(width: 15),
 
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Selamat Datang 👋",
-                          style: TextStyle(
-                            fontSize: 26,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                  Expanded(
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const Text(
+        "Selamat Datang 👋",
+        style: TextStyle(
+          fontSize: 26,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
 
-                        SizedBox(height: 5),
+      const SizedBox(height: 5),
 
-                        Text(
-                          "Selamat datang di ZenFit",
-                          style: TextStyle(color: Colors.black54, fontSize: 16),
-                        ),
-                      ],
-                    ),
-                  ),
+      Text(
+        user?.email ?? "Selamat datang di ZenFit",
+        style: const TextStyle(
+          color: Colors.black54,
+          fontSize: 16,
+        ),
+      ),
+    ],
+  ),
+),
 
                   Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: IconButton(
-                      onPressed: () {},
-                      icon: const Icon(Icons.notifications_none, size: 30),
-                    ),
-                  ),
+  decoration: BoxDecoration(
+    color: Colors.white,
+    borderRadius: BorderRadius.circular(15),
+  ),
+  child: IconButton(
+    onPressed: () async {
+      await _auth.logout();
+
+      if (context.mounted) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const LoginScreen(),
+          ),
+          (route) => false,
+        );
+      }
+    },
+    icon: const Icon(
+      Icons.logout,
+      size: 30,
+    ),
+  ),
+),
+
                 ],
               ),
+
+              const SizedBox(height: 30),
 
               const SizedBox(height: 30),
 

@@ -495,7 +495,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
             case 0:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const DashboardScreen()),
+                MaterialPageRoute(builder: (_) => DashboardScreen()),
               );
               break;
 

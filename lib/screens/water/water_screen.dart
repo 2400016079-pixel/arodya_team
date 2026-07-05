@@ -217,7 +217,7 @@ class _WaterScreenState extends State<WaterScreen> {
             case 0:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const DashboardScreen()),
+                MaterialPageRoute(builder: (_) => DashboardScreen()),
               );
               break;
 

@@ -141,7 +141,7 @@ class StatisticsScreen extends StatelessWidget {
             case 0:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const DashboardScreen()),
+                MaterialPageRoute(builder: (_) => DashboardScreen()),
               );
               break;
 
