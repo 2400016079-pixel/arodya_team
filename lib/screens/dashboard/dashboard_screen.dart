@@ -4,17 +4,16 @@ import '../../widgets/bottom_navbar.dart';
 import '../../widgets/dashboard_card.dart';
 import '../../widgets/history_tile.dart';
 import '../../widgets/weekly_bar.dart';
-import '../water/add_drink_screen.dart';
 import '../activity/activity_screen.dart';
-import '../water/water_screen.dart';
+import '../profile/profile_screen.dart';
+import '../settings/notification_screen.dart';
 import '../statistics/statistics_screen.dart';
+import '../water/add_drink_screen.dart';
+import '../water/water_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
 
-  // Both the FloatingActionButton and the "New Activity" button used to be
-  // two separate "add" affordances that each did nothing (onPressed: () {}).
-  // They're now wired to the same action sheet instead of being dead ends.
   void _openQuickAddSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -82,7 +81,6 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffF7F9F8),
-
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 20),
@@ -93,12 +91,21 @@ class DashboardScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Icon(Icons.person_outline, size: 32),
+                  IconButton(
+                    icon: const Icon(Icons.person_outline, size: 32),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ProfileScreen(),
+                        ),
+                      );
+                    },
+                  ),
                   Row(
                     children: [
                       Container(
-                        width: 38,
-                        height: 38,
+                        padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
                           color: const Color(0xff35694A),
                           borderRadius: BorderRadius.circular(10),
@@ -119,7 +126,17 @@ class DashboardScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const Icon(Icons.notifications_none, size: 32),
+                  IconButton(
+                    icon: const Icon(Icons.notifications_none, size: 32),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const NotificationScreen(),
+                        ),
+                      );
+                    },
+                  ),
                 ],
               ),
 
@@ -179,29 +196,29 @@ class DashboardScreen extends StatelessWidget {
               const SizedBox(height: 20),
 
               //================ ACTIVITY ================
-              DashboardCard(
+              const DashboardCard(
                 icon: Icons.directions_run,
-                iconBackground: const Color(0xffDDEBDD),
-                iconColor: const Color(0xff35694A),
+                iconBackground: Color(0xffDDEBDD),
+                iconColor: Color(0xff35694A),
                 title: "Activity Tracker",
                 value: "45 Min",
                 subtitle: "Jogging • +15% dari kemarin",
-                backgroundColor: const Color(0xffEDF5EF),
-                borderColor: const Color(0xffD3E3D7),
+                backgroundColor: Color(0xffEDF5EF),
+                borderColor: Color(0xffD3E3D7),
               ),
 
               const SizedBox(height: 20),
 
               //================ MOOD ================
-              DashboardCard(
+              const DashboardCard(
                 icon: Icons.sentiment_very_satisfied,
-                iconBackground: const Color(0xffE6F2E8),
-                iconColor: const Color(0xff35694A),
+                iconBackground: Color(0xffE6F2E8),
+                iconColor: Color(0xff35694A),
                 title: "Mood Tracker",
                 value: "😊",
                 subtitle: "Feeling balanced and focused today",
                 backgroundColor: Colors.white,
-                borderColor: const Color(0xffECECEC),
+                borderColor: Color(0xffECECEC),
               ),
 
               const SizedBox(height: 35),
@@ -304,41 +321,39 @@ class DashboardScreen extends StatelessWidget {
           ),
         ),
       ),
-
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xff35694A),
         onPressed: () => _openQuickAddSheet(context),
         child: const Icon(Icons.add, color: Colors.white),
       ),
-
       bottomNavigationBar: BottomNavbar(
         currentIndex: 0,
         onTap: (index) {
+          if (index == 0) return;
+
+          Widget targetScreen;
           switch (index) {
-            case 0:
-              break;
-
             case 1:
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const ActivityScreen()),
-              );
+              targetScreen = const ActivityScreen();
               break;
-
             case 2:
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const WaterScreen()),
-              );
+              targetScreen = const WaterScreen();
               break;
-
             case 3:
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const StatisticsScreen()),
-              );
+              targetScreen = const StatisticsScreen();
               break;
+            default:
+              return;
           }
+
+          Navigator.pushReplacement(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (_, __, ___) => targetScreen,
+              transitionDuration: Duration.zero,
+              reverseTransitionDuration: Duration.zero,
+            ),
+          );
         },
       ),
     );

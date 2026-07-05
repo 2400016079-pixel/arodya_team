@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import '../../widgets/bottom_navbar.dart';
 import '../../widgets/stat_card.dart';
 import '../../widgets/stats_summary_tile.dart';
-
-// Catatan: Pastikan kelas _LineChartPainter juga sudah kamu buat di file ini 
-// atau di-import dari file lain agar tidak error.
+import '../activity/activity_screen.dart';
+import '../dashboard/dashboard_screen.dart';
+import '../water/water_screen.dart';
 
 class StatisticsScreen extends StatefulWidget {
   const StatisticsScreen({super.key});
@@ -21,23 +21,35 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffF8FAF9),
-      // PERBAIKAN 1: Memindahkan bottomNavigationBar ke tempat yang benar (di dalam Scaffold)
       bottomNavigationBar: BottomNavbar(
-        currentIndex: 4,
+        currentIndex: 3,
         onTap: (index) {
+          if (index == 3) return; // Mencegah navigasi ulang ke diri sendiri
+
+          Widget targetScreen;
           switch (index) {
             case 0:
-              Navigator.pop(context);
+              targetScreen = const DashboardScreen();
               break;
             case 1:
+              targetScreen = const ActivityScreen();
               break;
             case 2:
+              targetScreen = const WaterScreen();
               break;
-            case 3:
-              break;
-            case 4:
-              break;
+            default:
+              return;
           }
+
+          Navigator.pushReplacement(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (_, __, ___) => targetScreen,
+              transitionDuration: Duration
+                  .zero, // Transisi instan agar terasa seperti tab bar sungguhan
+              reverseTransitionDuration: Duration.zero,
+            ),
+          );
         },
       ),
       body: SafeArea(
@@ -50,10 +62,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Icon(
-                    Icons.person_outline,
-                    size: 30,
-                  ),
+                  const Icon(Icons.person_outline, size: 30),
                   Row(
                     children: [
                       Container(
@@ -80,27 +89,18 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                       ),
                     ],
                   ),
-                  const Icon(
-                    Icons.notifications_none,
-                    size: 30,
-                  ),
+                  const Icon(Icons.notifications_none, size: 30),
                 ],
               ),
               const SizedBox(height: 35),
               const Text(
                 "Stats",
-                style: TextStyle(
-                  fontSize: 48,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               const Text(
                 "Your progress this week.",
-                style: TextStyle(
-                  fontSize: 22,
-                  color: Colors.black54,
-                ),
+                style: TextStyle(fontSize: 22, color: Colors.black54),
               ),
               const SizedBox(height: 24),
 
@@ -198,7 +198,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                       height: 220,
                       child: CustomPaint(
                         size: const Size(double.infinity, 220),
-                        painter: _LineChartPainter(), // Pastikan kelas painter ini ada
+                        painter: _LineChartPainter(),
                       ),
                     ),
                   ],
@@ -243,6 +243,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                             ),
                           ),
                           Column(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               const Text(
                                 "55%",
@@ -264,50 +265,38 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                       ),
                     ),
                     const SizedBox(height: 35),
-                    _legend(
-                      const Color(0xff4F7F5D),
-                      "Calm",
-                      "14 hrs",
-                    ),
+                    _legend(const Color(0xff4F7F5D), "Calm", "14 hrs"),
                     const SizedBox(height: 15),
-                    _legend(
-                      const Color(0xff9DD5AB),
-                      "Energetic",
-                      "7 hrs",
-                    ),
+                    _legend(const Color(0xff9DD5AB), "Energetic", "7 hrs"),
                     const SizedBox(height: 15),
-                    _legend(
-                      const Color(0xffDDE8E1),
-                      "Stressed",
-                      "3 hrs",
-                    ),
+                    _legend(const Color(0xffDDE8E1), "Stressed", "3 hrs"),
                   ],
                 ),
               ),
               const SizedBox(height: 30),
 
               //================ SUMMARY =================
-              StatsSummaryTile(
+              const StatsSummaryTile(
                 icon: Icons.water_drop,
-                iconBg: const Color(0xffDCEBFF),
-                iconColor: const Color(0xff2E6EA8),
+                iconBg: Color(0xffDCEBFF),
+                iconColor: Color(0xff2E6EA8),
                 title: "Hydration",
                 value: "2.4",
                 unit: "L/day",
               ),
               const SizedBox(height: 20),
-              StatsSummaryTile(
+              const StatsSummaryTile(
                 icon: Icons.fitness_center,
-                iconBg: const Color(0xffDDF5E8),
-                iconColor: const Color(0xff4F7F5D),
+                iconBg: Color(0xffDDF5E8),
+                iconColor: Color(0xff4F7F5D),
                 title: "Total Workouts",
                 value: "142",
                 unit: "times",
               ),
               const SizedBox(height: 20),
-              StatsSummaryTile(
+              const StatsSummaryTile(
                 icon: Icons.nightlight_round,
-                iconBg: const Color(0xffECECEC),
+                iconBg: Color(0xffECECEC),
                 iconColor: Colors.blueGrey,
                 title: "Sleep",
                 value: "7.2",
@@ -321,7 +310,6 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     );
   }
 
-  // PERBAIKAN 2: Mengeluarkan fungsi widget ini ke luar metode build()
   Widget _tabButton(String title, int index) {
     final selected = selectedTab == index;
     return GestureDetector(
@@ -331,10 +319,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
         });
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 24,
-          vertical: 12,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         decoration: BoxDecoration(
           color: selected ? const Color(0xff35694A) : Colors.transparent,
           borderRadius: BorderRadius.circular(30),
@@ -354,32 +339,18 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   Widget _legend(Color color, String title, String value) {
     return Row(
       children: [
-        CircleAvatar(
-          radius: 7,
-          backgroundColor: color,
-        ),
+        CircleAvatar(radius: 7, backgroundColor: color),
         const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            title,
-            style: const TextStyle(
-              fontSize: 20,
-            ),
-          ),
-        ),
+        Expanded(child: Text(title, style: const TextStyle(fontSize: 20))),
         Text(
           value,
-          style: const TextStyle(
-            color: Colors.black54,
-            fontSize: 18,
-          ),
+          style: const TextStyle(color: Colors.black54, fontSize: 18),
         ),
       ],
     );
   }
 }
 
-// Dummy class untuk menghindari error jika Anda belum membuat custom painter-nya
 class _LineChartPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {}

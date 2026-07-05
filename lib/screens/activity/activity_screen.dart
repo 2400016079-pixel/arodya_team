@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../../widgets/activity_item.dart';
 import '../../widgets/bottom_navbar.dart';
+import '../dashboard/dashboard_screen.dart';
+import '../water/water_screen.dart';
+import '../statistics/statistics_screen.dart';
 
 class ActivityScreen extends StatefulWidget {
   const ActivityScreen({super.key});
@@ -42,10 +45,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Icon(
-                    Icons.person_outline,
-                    size: 30,
-                  ),
+                  const Icon(Icons.person_outline, size: 30),
                   Row(
                     children: [
                       Container(
@@ -72,10 +72,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
                       ),
                     ],
                   ),
-                  const Icon(
-                    Icons.notifications_none,
-                    size: 30,
-                  ),
+                  const Icon(Icons.notifications_none, size: 30),
                 ],
               ),
 
@@ -83,24 +80,18 @@ class _ActivityScreenState extends State<ActivityScreen> {
 
               const Text(
                 "Log Activity",
-                style: TextStyle(
-                  fontSize: 38,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 38, fontWeight: FontWeight.bold),
               ),
 
               const SizedBox(height: 8),
 
               const Text(
                 "What did you practice today?",
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Colors.black54,
-                ),
+                style: TextStyle(fontSize: 20, color: Colors.black54),
               ),
 
               const SizedBox(height: 35),
-              
+
               //================ ACTIVITY GRID =================
               Wrap(
                 spacing: 18,
@@ -203,7 +194,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
                       color: Colors.black.withOpacity(.05),
                       blurRadius: 20,
                       offset: const Offset(0, 10),
-                    )
+                    ),
                   ],
                 ),
                 child: Column(
@@ -217,7 +208,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                        ),
+                          ),
                         ),
                         Text(
                           "${duration.round()} min",
@@ -243,13 +234,10 @@ class _ActivityScreenState extends State<ActivityScreen> {
                     ),
                     const Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text("5m"),
-                        Text("3h"),
-                      ],
+                      children: [Text("5m"), Text("3h")],
                     ),
                     const SizedBox(height: 30),
-                    
+
                     //================ DATE =================
                     const Text(
                       "Date",
@@ -331,20 +319,14 @@ class _ActivityScreenState extends State<ActivityScreen> {
                     Navigator.pop(context);
                   },
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(
-                      color: Color(0xff35694A),
-                      width: 2,
-                    ),
+                    side: const BorderSide(color: Color(0xff35694A), width: 2),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
                   ),
                   child: const Text(
                     "Cancel",
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Color(0xff35694A),
-                    ),
+                    style: TextStyle(fontSize: 20, color: Color(0xff35694A)),
                   ),
                 ),
               ),
@@ -358,9 +340,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
                 child: ElevatedButton(
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Activity Saved"),
-                      ),
+                      const SnackBar(content: Text("Activity Saved")),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -371,26 +351,46 @@ class _ActivityScreenState extends State<ActivityScreen> {
                   ),
                   child: const Text(
                     "Save Activity",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                    ),
+                    style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
                 ),
               ),
-              
+
               // Memberikan jarak bawah agar tidak tertutup navbar
-              const SizedBox(height: 40), 
+              const SizedBox(height: 40),
             ],
           ),
         ),
       ),
-      
-      // BOTTOM NAVBAR DILETAKKAN DI SINI (Properti langsung dari Scaffold)
+
       bottomNavigationBar: BottomNavbar(
         currentIndex: 1,
         onTap: (index) {
-          // Aksi ketika navbar ditekan
+          switch (index) {
+            case 0:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const DashboardScreen()),
+              );
+              break;
+
+            case 1:
+              break;
+
+            case 2:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const WaterScreen()),
+              );
+              break;
+
+            case 3:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const StatisticsScreen()),
+              );
+              break;
+          }
         },
       ),
     );

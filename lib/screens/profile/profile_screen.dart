@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import '../../widgets/bottom_navbar.dart';
 import '../../widgets/profile_setting_tile.dart';
 import '../../widgets/profile_stat_card.dart';
+import '../dashboard/dashboard_screen.dart';
+import '../activity/activity_screen.dart';
+import '../water/water_screen.dart';
+import '../statistics/statistics_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -11,27 +15,43 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffF8FAF9),
-      
+
       // PERBAIKAN: Memindahkan bottomNavigationBar ke level Scaffold (di luar body)
       bottomNavigationBar: BottomNavbar(
         currentIndex: 0,
         onTap: (index) {
           switch (index) {
             case 0:
-              Navigator.pop(context);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const DashboardScreen()),
+              );
               break;
+
             case 1:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const ActivityScreen()),
+              );
               break;
+
             case 2:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const WaterScreen()),
+              );
               break;
+
             case 3:
-              break;
-            case 4:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const StatisticsScreen()),
+              );
               break;
           }
         },
       ),
-      
+
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -49,10 +69,7 @@ class ProfileScreen extends StatelessWidget {
                       color: Color(0xff35694A),
                     ),
                   ),
-                  const Icon(
-                    Icons.person_outline,
-                    size: 32,
-                  ),
+                  const Icon(Icons.person_outline, size: 32),
                 ],
               ),
               const SizedBox(height: 40),
@@ -65,9 +82,7 @@ class ProfileScreen extends StatelessWidget {
                     backgroundColor: const Color(0xffE5EFE8),
                     child: const CircleAvatar(
                       radius: 80,
-                      backgroundImage: AssetImage(
-                        "assets/images/profile.jpg",
-                      ),
+                      backgroundImage: AssetImage("assets/images/profile.jpg"),
                     ),
                   ),
                   const Positioned(
@@ -76,10 +91,7 @@ class ProfileScreen extends StatelessWidget {
                     child: CircleAvatar(
                       radius: 22,
                       backgroundColor: Color(0xff4F7F5D),
-                      child: Icon(
-                        Icons.edit,
-                        color: Colors.white,
-                      ),
+                      child: Icon(Icons.edit, color: Colors.white),
                     ),
                   ),
                 ],
@@ -87,19 +99,13 @@ class ProfileScreen extends StatelessWidget {
               const SizedBox(height: 24),
               const Text(
                 "rosiana",
-                style: TextStyle(
-                  fontSize: 42,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 42, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
               const Text(
                 "Find balance in motion, harmony in stillness.",
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.black54,
-                  fontSize: 20,
-                ),
+                style: TextStyle(color: Colors.black54, fontSize: 20),
               ),
               const SizedBox(height: 40),
 
@@ -297,10 +303,7 @@ class ProfileScreen extends StatelessWidget {
                 height: 60,
                 child: ElevatedButton.icon(
                   onPressed: () {},
-                  icon: const Icon(
-                    Icons.logout,
-                    color: Colors.red,
-                  ),
+                  icon: const Icon(Icons.logout, color: Colors.red),
                   label: const Text(
                     "Log Out",
                     style: TextStyle(

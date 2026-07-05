@@ -177,9 +177,8 @@ class HistoryScreen extends StatelessWidget {
                 ],
               ),
 
-              // Jarak ekstra di bawah scroll agar tidak tertutup Navbar
               const SizedBox(height: 100),
-            ], // <--- Penutup array children milik Column yang benar
+            ], 
           ),
         ),
       ),

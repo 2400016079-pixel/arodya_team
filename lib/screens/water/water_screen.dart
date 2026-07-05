@@ -4,6 +4,9 @@ import '../../widgets/bottom_navbar.dart';
 import '../../widgets/water_option.dart';
 import '../../widgets/water_history_tile.dart';
 import 'add_drink_screen.dart';
+import '../dashboard/dashboard_screen.dart';
+import '../activity/activity_screen.dart';
+import '../statistics/statistics_screen.dart';
 
 class WaterScreen extends StatefulWidget {
   const WaterScreen({super.key});
@@ -101,9 +104,41 @@ class _WaterScreenState extends State<WaterScreen> {
       ),
 
       bottomNavigationBar: BottomNavbar(
-        currentIndex: 2,
-        onTap: (index) {},
-      ),
+  currentIndex: 2,
+  onTap: (index) {
+    switch (index) {
+      case 0:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const DashboardScreen(),
+          ),
+        );
+        break;
+
+      case 1:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const ActivityScreen(),
+          ),
+        );
+        break;
+
+      case 2:
+        break;
+
+      case 3:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const StatisticsScreen(),
+          ),
+        );
+        break;
+    }
+  },
+),
 
       body: SafeArea(
         child: SingleChildScrollView(
