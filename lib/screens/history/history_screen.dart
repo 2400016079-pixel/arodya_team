@@ -1,342 +1,208 @@
 import 'package:flutter/material.dart';
 
-class HistoryScreen extends StatefulWidget {
+import '../../widgets/bottom_navbar.dart';
+import '../../widgets/history_event_card.dart';
+
+class HistoryScreen extends StatelessWidget {
   const HistoryScreen({super.key});
 
   @override
-  State<HistoryScreen> createState() => _HistoryScreenState();
-}
-
-class _HistoryScreenState extends State<HistoryScreen>
-    with SingleTickerProviderStateMixin {
-
-  late TabController _tabController;
-
-  final List<Map<String, dynamic>> history = [
-
-    {
-      "icon": Icons.self_improvement,
-      "title": "Vinyasa Flow Yoga",
-      "subtitle": "45 mins • Morning Routine",
-      "day": "Today",
-      "time": "07:30 AM",
-      "color": Colors.green,
-    },
-
-    {
-      "icon": Icons.water_drop,
-      "title": "Hydration Goal Met",
-      "subtitle": "64 oz total",
-      "day": "Today",
-      "time": "02:15 PM",
-      "color": Colors.blue,
-    },
-
-    {
-      "icon": Icons.sentiment_satisfied_alt,
-      "title": "Evening Check-in",
-      "subtitle": "Relaxed & centered",
-      "day": "Yesterday",
-      "time": "08:00 PM",
-      "color": Colors.orange,
-    },
-
-    {
-      "icon": Icons.fitness_center,
-      "title": "Lower Body Focus",
-      "subtitle": "60 mins • Strength",
-      "day": "Yesterday",
-      "time": "06:00 PM",
-      "color": Colors.green,
-    },
-
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-
-    _tabController = TabController(
-      length: 4,
-      vsync: this,
-    );
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-
-      backgroundColor: Colors.white,
-
-      appBar: AppBar(
-
-        backgroundColor: Colors.white,
-        elevation: 1,
-
-        leadingWidth: 70,
-
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 15),
-          child: CircleAvatar(
-            radius: 22,
-            backgroundColor: const Color(0xffECEFF1),
-            child: Icon(
-              Icons.person_outline,
-              color: Colors.grey.shade700,
-            ),
-          ),
-        ),
-
-        title: const Text(
-          "ZenFit",
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-            color: Color(0xff013220),
-          ),
-        ),
-
-        actions: const [
-
-          Padding(
-            padding: EdgeInsets.only(right: 20),
-            child: Icon(
-              Icons.notifications_none,
-              size: 32,
-              color: Color(0xff013220),
-            ),
-          )
-
-        ],
-      ),
+      backgroundColor: const Color(0xffF8FAF9),
 
       body: SafeArea(
-
-        child: Column(
-
-          children: [
-
-            const SizedBox(height: 35),
-
-            const Text(
-              "Riwayat",
-              style: TextStyle(
-                fontSize: 34,
-                fontWeight: FontWeight.bold,
-                color: Color(0xff013220),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              //================ HEADER =================
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Icon(
+                    Icons.person_outline,
+                    size: 30,
+                  ),
+                  Row(
+                    children: [
+                      Container(
+                        width: 34,
+                        height: 34,
+                        decoration: BoxDecoration(
+                          color: const Color(0xff35694A),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(
+                          Icons.self_improvement,
+                          color: Colors.white,
+                          size: 18,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        "ZenFit",
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xff35694A),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Icon(
+                    Icons.notifications_none,
+                    size: 30,
+                  ),
+                ],
               ),
-            ),
 
-            const SizedBox(height: 10),
+              const SizedBox(height: 40),
 
-            const Text(
-              "Review your wellness journey.",
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.black54,
-              ),
-            ),
-
-            const SizedBox(height: 30),
-
-            TabBar(
-
-              controller: _tabController,
-
-              indicatorColor: Colors.green,
-
-              labelColor: Colors.green,
-
-              unselectedLabelColor: Colors.black54,
-
-              tabs: const [
-
-                Tab(text: "All"),
-                Tab(text: "Activity"),
-                Tab(text: "Water"),
-                Tab(text: "Mood"),
-
-              ],
-
-            ),
-
-            const SizedBox(height: 15),
-
-            Expanded(
-
-              child: ListView.builder(
-
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20),
-
-                itemCount: history.length,
-
-                itemBuilder: (context, index) {
-
-                  final item = history[index];
-
-                  return Container(
-
-                    margin: const EdgeInsets.only(bottom: 20),
-
-                    padding: const EdgeInsets.all(18),
-
-                    decoration: BoxDecoration(
-
-                      color: Colors.white,
-
-                      borderRadius: BorderRadius.circular(22),
-
-                      boxShadow: [
-
-                        BoxShadow(
-
-                          color: Colors.grey.withOpacity(.15),
-
-                          blurRadius: 12,
-
-                          offset: const Offset(0,4),
-
-                        )
-
-                      ],
-
+              //================ TITLE: TODAY =================
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Today",
+                    style: TextStyle(
+                      fontSize: 40,
+                      fontWeight: FontWeight.bold,
                     ),
-
-                    child: Row(
-
-                      children: [
-
-                        CircleAvatar(
-
-                          radius: 28,
-
-                          backgroundColor:
-                              item["color"].withOpacity(.12),
-
-                          child: Icon(
-
-                            item["icon"],
-
-                            color: item["color"],
-
-                            size: 30,
-
-                          ),
-
-                        ),
-
-                        const SizedBox(width: 18),
-
-                        Expanded(
-
-                          child: Column(
-
-                            crossAxisAlignment:
-                                CrossAxisAlignment.start,
-
-                            children: [
-
-                              Text(
-
-                                item["title"],
-
-                                style: const TextStyle(
-
-                                  fontSize: 18,
-
-                                  fontWeight: FontWeight.bold,
-
-                                ),
-
-                              ),
-
-                              const SizedBox(height:5),
-
-                              Text(
-
-                                item["subtitle"],
-
-                                style: const TextStyle(
-
-                                  color: Colors.black54,
-
-                                  fontSize: 16,
-
-                                ),
-
-                              ),
-
-                            ],
-
-                          ),
-
-                        ),
-                                              Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              item["day"],
-                              style: TextStyle(
-                                color: item["color"],
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              item["time"],
-                              style: const TextStyle(
-                                color: Colors.black87,
-                                fontSize: 15,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                  ),
+                  Text(
+                    "Oct 24, 2023",
+                    style: TextStyle(
+                      color: Colors.grey.shade700,
+                      fontSize: 20,
                     ),
-                  );
-                },
+                  ),
+                ],
               ),
-            ),
-          ],
+
+              const SizedBox(height: 28),
+
+              //================ EVENTS: TODAY =================
+              const HistoryEventCard(
+                icon: Icons.directions_run,
+                iconBg: Color(0xffE5EFE8),
+                iconColor: Color(0xff35694A),
+                title: "Morning Run",
+                description:
+                    "Crisp air, felt very energized throughout the route.",
+                time: "07:30 AM",
+                tags: [
+                  "Cardio",
+                  "5.2 km",
+                  "42 min",
+                ],
+              ),
+
+              const HistoryEventCard(
+                icon: Icons.water_drop,
+                iconBg: Color(0xffDCEBFF),
+                iconColor: Color(0xff2E6EA8),
+                title: "Hydration",
+                description: "Logged 500ml",
+                time: "10:15 AM",
+                tags: [
+                  "500 ml",
+                ],
+              ),
+
+              const HistoryEventCard(
+                icon: Icons.sentiment_satisfied_alt,
+                iconBg: Color(0xffE5EFE8),
+                iconColor: Color(0xff5F6B63),
+                title: "Check-in",
+                description: "Feeling focused and calm after lunch.",
+                time: "01:00 PM",
+                tags: [
+                  "Productive",
+                  "Balanced",
+                ],
+              ),
+
+              const SizedBox(height: 30),
+              
+              //================ TITLE: YESTERDAY =================
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Yesterday",
+                    style: TextStyle(
+                      fontSize: 40,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    "Oct 23, 2023",
+                    style: TextStyle(
+                      color: Colors.grey.shade700,
+                      fontSize: 20,
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 28),
+
+              //================ EVENTS: YESTERDAY =================
+              const HistoryEventCard(
+                icon: Icons.self_improvement,
+                iconBg: Color(0xffE5EFE8),
+                iconColor: Color(0xff35694A),
+                title: "Evening Yoga",
+                description:
+                    "Restorative flow. Needed the stretch after a long desk day.",
+                time: "08:00 PM",
+                tags: [
+                  "Flexibility",
+                  "30 min",
+                ],
+              ),
+
+              const HistoryEventCard(
+                icon: Icons.water_drop,
+                iconBg: Color(0xffDCEBFF),
+                iconColor: Color(0xff2E6EA8),
+                title: "Daily Goal Met",
+                description: "Total: 2500ml ✅",
+                time: "06:45 PM",
+                tags: [
+                  "2500 ml",
+                  "Goal Achieved",
+                ],
+              ),
+
+              const SizedBox(height: 100),
+            ], 
+          ),
         ),
       ),
 
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: const Color(0xff0C9E6E),
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: "Home",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.directions_run),
-            label: "Activity",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.water_drop),
-            label: "Water",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart),
-            label: "Stats",
-          ),
-        ],
+      //================ BOTTOM NAVBAR =================
+      bottomNavigationBar: BottomNavbar(
+        currentIndex: 1,
         onTap: (index) {
-          // TODO: Navigator ke halaman lain
+          switch (index) {
+            case 0:
+              Navigator.pop(context);
+              break;
+            case 1:
+              // Sudah berada di History
+              break;
+            case 2:
+              break;
+            case 3:
+              break;
+            case 4:
+              break;
+          }
         },
       ),
     );
   }
-}  
+}

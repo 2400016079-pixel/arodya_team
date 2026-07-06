@@ -12,7 +12,20 @@
           "package_name": "com.example.zenfit"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "76387988997-f3meoq72b0b3ma1cli5jllssnomc6aat.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.zenfit",
+            "certificate_hash": "38fa16032c5770e1ac369045db0f70ee6ee6ad25"
+          }
+        },
+        {
+          "client_id": "76387988997-fc3jn1qj3h6h0490o4hn0k2vcb0h8hfr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBKIr-2R62gUsIgiVYCW5UubTBdC8a0rVY"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "76387988997-fc3jn1qj3h6h0490o4hn0k2vcb0h8hfr.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "76387988997-j6emgoh2s8h6eccchu8mqjgqvkpsjctv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.zenfit"
+              }
+            }
+          ]
         }
       }
     }
