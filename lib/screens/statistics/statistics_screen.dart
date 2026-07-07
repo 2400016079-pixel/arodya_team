@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../models/activity_model.dart';
+import '../../services/activity_service.dart';
+
 import '../../widgets/bottom_navbar.dart';
 import '../../widgets/stat_card.dart';
 import '../../widgets/stats_summary_tile.dart';
@@ -294,19 +297,89 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                 unit: "times",
               ),
               const SizedBox(height: 20),
-              const StatsSummaryTile(
-                icon: Icons.nightlight_round,
-                iconBg: Color(0xffECECEC),
-                iconColor: Colors.blueGrey,
-                title: "Sleep",
-                value: "7.2",
-                unit: "hr/night",
+const StatsSummaryTile(
+  icon: Icons.nightlight_round,
+  iconBg: Color(0xffECECEC),
+  iconColor: Colors.blueGrey,
+  title: "Sleep",
+  value: "7.2",
+  unit: "hr/night",
+),
+
+const SizedBox(height: 40),
+
+const Text(
+  "Activity History",
+  style: TextStyle(
+    fontSize: 28,
+    fontWeight: FontWeight.bold,
+  ),
+),
+
+const SizedBox(height: 20),
+
+StreamBuilder<List<ActivityModel>>(
+  stream: ActivityService().getActivities(),
+  builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    if (snapshot.hasError) {
+      return Text(snapshot.error.toString());
+    }
+
+    if (!snapshot.hasData || snapshot.data!.isEmpty) {
+      return const Center(
+        child: Text("Belum ada activity"),
+      );
+    }
+
+    final activities = snapshot.data!;
+
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: activities.length,
+      itemBuilder: (context, index) {
+        final item = activities[index];
+
+        return Card(
+          margin: const EdgeInsets.only(bottom: 12),
+          child: ListTile(
+            leading: const CircleAvatar(
+              child: Icon(Icons.fitness_center),
+            ),
+            title: Text(item.activity),
+            subtitle: Text(
+              "${item.duration} menit\n"
+              "${item.intensity}\n"
+              "${item.date.day}/${item.date.month}/${item.date.year}",
+            ),
+            isThreeLine: true,
+            trailing: IconButton(
+              icon: const Icon(
+                Icons.delete,
+                color: Colors.red,
               ),
-              const SizedBox(height: 40),
-            ],
+              onPressed: () async {
+                await ActivityService().deleteActivity(item.id!);
+              },
+            ),
           ),
-        ),
-      ),
+        );
+      },
+    );
+  },
+),
+
+const SizedBox(height: 40),
+],
+),
+),
+),
     );
   }
 

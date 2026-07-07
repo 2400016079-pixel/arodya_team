@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../services/auth_service.dart';
+import '../../services/activity_service.dart';
+import '../../models/activity_model.dart';
 
 import '../../widgets/bottom_navbar.dart';
 import '../../widgets/dashboard_card.dart';
@@ -48,20 +50,22 @@ class DashboardScreen extends StatelessWidget {
                 },
               ),
               ListTile(
-                leading: const Icon(
-                  Icons.directions_run,
-                  color: Color(0xff35694A),
-                ),
-                title: const Text("Log Activity"),
-                onTap: () {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Activity logging screen not built yet"),
-                    ),
-                  );
-                },
-              ),
+  leading: const Icon(
+    Icons.directions_run,
+    color: Color(0xff35694A),
+  ),
+  title: const Text("Log Activity"),
+  onTap: () {
+    Navigator.pop(context);
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const ActivityScreen(),
+      ),
+    );
+  },
+),
               ListTile(
                 leading: const Icon(
                   Icons.sentiment_satisfied,
@@ -254,16 +258,43 @@ class DashboardScreen extends StatelessWidget {
               const SizedBox(height: 20),
 
               //================ ACTIVITY ================
-              const DashboardCard(
-                icon: Icons.directions_run,
-                iconBackground: Color(0xffDDEBDD),
-                iconColor: Color(0xff35694A),
-                title: "Activity Tracker",
-                value: "45 Min",
-                subtitle: "Jogging • +15% dari kemarin",
-                backgroundColor: Color(0xffEDF5EF),
-                borderColor: Color(0xffD3E3D7),
-              ),
+              StreamBuilder<List<ActivityModel>>(
+  stream: ActivityService().getActivities(),
+  builder: (context, snapshot) {
+    if (!snapshot.hasData || snapshot.data!.isEmpty) {
+      return const DashboardCard(
+        icon: Icons.directions_run,
+        iconBackground: Color(0xffDDEBDD),
+        iconColor: Color(0xff35694A),
+        title: "Activity Tracker",
+        value: "0 Min",
+        subtitle: "Belum ada activity",
+        backgroundColor: Color(0xffEDF5EF),
+        borderColor: Color(0xffD3E3D7),
+      );
+    }
+
+    final activities = snapshot.data!;
+
+    final latest = activities.first;
+
+    final totalMinutes = activities.fold<int>(
+      0,
+      (sum, item) => sum + item.duration,
+    );
+
+    return DashboardCard(
+      icon: Icons.directions_run,
+      iconBackground: const Color(0xffDDEBDD),
+      iconColor: const Color(0xff35694A),
+      title: "Activity Tracker",
+      value: "$totalMinutes Min",
+      subtitle: latest.activity,
+      backgroundColor: const Color(0xffEDF5EF),
+      borderColor: const Color(0xffD3E3D7),
+    );
+  },
+),
 
               const SizedBox(height: 20),
 
@@ -283,76 +314,122 @@ class DashboardScreen extends StatelessWidget {
 
               //================ HISTORY =================
               const Text(
-                "History Activity",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
+  "History Activity",
+  style: TextStyle(
+    fontSize: 24,
+    fontWeight: FontWeight.bold,
+  ),
+),
 
-              const SizedBox(height: 18),
+const SizedBox(height: 18),
 
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(.05),
-                      blurRadius: 18,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: const Column(
-                  children: [
-                    HistoryTile(
-                      icon: Icons.directions_run,
-                      iconColor: Color(0xff35694A),
-                      iconBackground: Color(0xffEAF5EC),
-                      title: "Morning Run",
-                      subtitle: "Today • 45 Minutes",
-                      trailing: "320 kcal",
-                    ),
-                    Divider(),
-                    HistoryTile(
-                      icon: Icons.water_drop,
-                      iconColor: Colors.blue,
-                      iconBackground: Color(0xffEAF2FF),
-                      title: "Drink Water",
-                      subtitle: "Today • 500 ml",
-                      trailing: "✔",
-                    ),
-                  ],
-                ),
-              ),
+StreamBuilder<List<ActivityModel>>(
+  stream: ActivityService().getActivities(),
+  builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
 
-              const SizedBox(height: 35),
+    if (!snapshot.hasData || snapshot.data!.isEmpty) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: const Center(
+          child: Text("Belum ada activity"),
+        ),
+      );
+    }
+
+    final activities = snapshot.data!;
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(.05),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: ListView.separated(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: activities.length > 5 ? 5 : activities.length,
+        separatorBuilder: (_, __) => const Divider(),
+        itemBuilder: (context, index) {
+          final item = activities[index];
+
+          return HistoryTile(
+            icon: Icons.directions_run,
+            iconColor: const Color(0xff35694A),
+            iconBackground: const Color(0xffEAF5EC),
+            title: item.activity,
+            subtitle:
+                "${item.date.day}/${item.date.month}/${item.date.year} • ${item.duration} Minutes",
+            trailing: item.intensity,
+          );
+        },
+      ),
+    );
+  },
+),
 
               //================ WEEKLY STATISTICS =================
-              const Text(
-                "Weekly Statistics",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
+const Text(
+  "Weekly Statistics",
+  style: TextStyle(
+    fontSize: 24,
+    fontWeight: FontWeight.bold,
+  ),
+),
 
-              const SizedBox(height: 25),
+const SizedBox(height: 25),
 
-              const SizedBox(
-                height: 180,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    WeeklyBar(height: 70, day: "Mon"),
-                    WeeklyBar(height: 110, day: "Tue"),
-                    WeeklyBar(height: 90, day: "Wed"),
-                    WeeklyBar(height: 140, day: "Thu"),
-                    WeeklyBar(height: 120, day: "Fri"),
-                    WeeklyBar(height: 160, day: "Sat"),
-                    WeeklyBar(height: 95, day: "Sun"),
-                  ],
-                ),
-              ),
+StreamBuilder<List<ActivityModel>>(
+  stream: ActivityService().getActivities(),
+  builder: (context, snapshot) {
+    final heights = List<double>.filled(7, 20);
 
-              const SizedBox(height: 35),
+    if (snapshot.hasData) {
+      for (var item in snapshot.data!) {
+        final day = item.date.weekday - 1;
+
+        heights[day] += item.duration.toDouble();
+
+        if (heights[day] > 160) {
+          heights[day] = 160;
+        }
+      }
+    }
+
+    return SizedBox(
+      height: 180,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          WeeklyBar(height: heights[0], day: "Mon"),
+          WeeklyBar(height: heights[1], day: "Tue"),
+          WeeklyBar(height: heights[2], day: "Wed"),
+          WeeklyBar(height: heights[3], day: "Thu"),
+          WeeklyBar(height: heights[4], day: "Fri"),
+          WeeklyBar(height: heights[5], day: "Sat"),
+          WeeklyBar(height: heights[6], day: "Sun"),
+        ],
+      ),
+    );
+  },
+),
 
               //================ BUTTON NEW ACTIVITY =================
               SizedBox(

@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import '../../models/activity_model.dart';
+import '../../services/activity_service.dart';
 
 import '../../widgets/activity_item.dart';
 import '../../widgets/bottom_navbar.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../water/water_screen.dart';
 import '../statistics/statistics_screen.dart';
-
 class ActivityScreen extends StatefulWidget {
   const ActivityScreen({super.key});
 
@@ -15,17 +18,35 @@ class ActivityScreen extends StatefulWidget {
 
 class _ActivityScreenState extends State<ActivityScreen> {
   int selectedActivity = 0;
-  double duration = 45;
 
-  final dateController = TextEditingController(text: "10/27/2026");
-  final intensityController = TextEditingController(text: "Moderate Flow");
-  final notesController = TextEditingController();
+  final List<String> activityList = [
+  "Walking",
+  "Running",
+  "Cycling",
+  "Yoga",
+  "Swimming",
+  "Weights",
+  "HIIT",
+  "Pilates",
+  ];
+
+double duration = 45;
+
+DateTime selectedDate = DateTime.now();
+
+String selectedIntensity = "Sedang";
+
+final dateController = TextEditingController(
+  text:
+      "${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}",
+);
+
+final notesController = TextEditingController();
 
   // Menambahkan dispose untuk membersihkan controller dari memori
   @override
   void dispose() {
     dateController.dispose();
-    intensityController.dispose();
     notesController.dispose();
     super.dispose();
   }
@@ -248,42 +269,80 @@ class _ActivityScreenState extends State<ActivityScreen> {
                     ),
                     const SizedBox(height: 12),
                     TextField(
-                      controller: dateController,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 18,
-                        ),
-                      ),
-                    ),
+  controller: dateController,
+  readOnly: true,
+  decoration: InputDecoration(
+    suffixIcon: const Icon(Icons.calendar_today),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(18),
+    ),
+    contentPadding: const EdgeInsets.symmetric(
+      horizontal: 20,
+      vertical: 18,
+    ),
+  ),
+  onTap: () async {
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: selectedDate,
+      firstDate: DateTime(2024),
+      lastDate: DateTime(2035),
+    );
+
+    if (pickedDate != null) {
+      setState(() {
+        selectedDate = pickedDate;
+        dateController.text =
+            "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
+      });
+    }
+  },
+),
                     const SizedBox(height: 25),
 
                     //================ INTENSITY =================
-                    const Text(
-                      "Intensity",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: intensityController,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 18,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 25),
+const Text(
+  "Intensity",
+  style: TextStyle(
+    fontSize: 20,
+    fontWeight: FontWeight.w600,
+  ),
+),
+const SizedBox(height: 12),
 
+DropdownButtonFormField<String>(
+  value: selectedIntensity,
+  decoration: InputDecoration(
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(18),
+    ),
+    contentPadding: const EdgeInsets.symmetric(
+      horizontal: 20,
+      vertical: 18,
+    ),
+  ),
+  items: const [
+    DropdownMenuItem(
+      value: "Ringan",
+      child: Text("Ringan"),
+    ),
+    DropdownMenuItem(
+      value: "Sedang",
+      child: Text("Sedang"),
+    ),
+    DropdownMenuItem(
+      value: "Tinggi",
+      child: Text("Tinggi"),
+    ),
+  ],
+  onChanged: (value) {
+    setState(() {
+      selectedIntensity = value!;
+    });
+  },
+),
+
+const SizedBox(height: 25),
                     //================ NOTES =================
                     const Text(
                       "Mindful Notes",
@@ -338,11 +397,51 @@ class _ActivityScreenState extends State<ActivityScreen> {
                 width: double.infinity,
                 height: 60,
                 child: ElevatedButton(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Activity Saved")),
-                    );
-                  },
+                 onPressed: () async {
+  if (notesController.text.trim().isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Silakan isi Mindful Notes"),
+      ),
+    );
+    return;
+  }
+
+  final activity = ActivityModel(
+    activity: activityList[selectedActivity],
+    duration: duration.round(),
+    date: selectedDate,
+    intensity: selectedIntensity,
+    notes: notesController.text.trim(),
+    createdAt: Timestamp.now(),
+  );
+
+  final error = await ActivityService().addActivity(activity);
+
+  if (!mounted) return;
+
+  if (error == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Activity berhasil disimpan"),
+      ),
+    );
+
+    setState(() {
+      selectedActivity = 0;
+      duration = 45;
+      selectedDate = DateTime.now();
+      dateController.text =
+          "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}";
+      selectedIntensity = "Sedang";
+      notesController.clear();
+    });
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(error)),
+    );
+  }
+},
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xff5A845F),
                     shape: RoundedRectangleBorder(
