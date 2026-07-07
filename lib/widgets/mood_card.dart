@@ -18,51 +18,38 @@ class MoodCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-
       child: Container(
-        width: 110,
-        height: 130,
-
+        // Tidak pakai width/height fixed lagi, ikut Expanded di parent
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 4),
         decoration: BoxDecoration(
-          color: selected
-              ? const Color(0xff5A845F)
-              : Colors.white,
-
-          borderRadius: BorderRadius.circular(20),
-
-          border: Border.all(
-            color: Colors.grey.shade300,
-          ),
-
+          color: selected ? const Color(0xff5A845F) : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.grey.shade300),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(.05),
-              blurRadius: 10,
+              blurRadius: 8,
             ),
           ],
         ),
-
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-
             Icon(
               icon,
-              size: 44,
-              color: selected
-                  ? Colors.white
-                  : const Color(0xff35694A),
+              size: 28,
+              color: selected ? Colors.white : const Color(0xff35694A),
             ),
-
-            const SizedBox(height: 12),
-
+            const SizedBox(height: 6),
             Text(
               title,
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: 20,
-                color: selected
-                    ? Colors.white
-                    : Colors.black87,
+                fontSize: 12,
+                color: selected ? Colors.white : Colors.black87,
                 fontWeight: FontWeight.w600,
               ),
             ),

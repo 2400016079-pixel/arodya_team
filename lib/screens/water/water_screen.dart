@@ -6,8 +6,8 @@ import '../../widgets/water_history_tile.dart';
 import 'add_drink_screen.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../activity/activity_screen.dart';
-import '../statistics/statistics_screen.dart';
 import '../mood/mood_screen.dart';
+import '../statistics/statistics_screen.dart';
 
 class WaterScreen extends StatefulWidget {
   const WaterScreen({super.key});
@@ -31,13 +31,10 @@ class _HistoryEntry {
 }
 
 class _WaterScreenState extends State<WaterScreen> {
-  // Renamed from "selectedIndex" to avoid confusion with the bottom
-  // navbar's own currentIndex — they used to share the same name even
-  // though they track two unrelated things.
   int selectedQuickAdd = -1;
 
   final int targetMl = 2000;
-  int consumedMl = 1200; // starting point so the 60% message is accurate
+  int consumedMl = 1200;
 
   final List<_HistoryEntry> history = [
     _HistoryEntry(
@@ -82,9 +79,6 @@ class _WaterScreenState extends State<WaterScreen> {
       MaterialPageRoute(builder: (context) => const AddDrinkScreen()),
     );
 
-    // AddDrinkScreen now returns a map like
-    // {"amount": 250, "drinkType": "Water", "temperature": "Normal"}
-    // instead of nothing, so we can actually use it here.
     if (result is Map && result["amount"] != null) {
       _addWater(
         result["amount"] as int,
@@ -95,13 +89,20 @@ class _WaterScreenState extends State<WaterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final isSmall = size.width < 380;
+    final hPad = size.width * 0.055;
+    // Diameter lingkaran progress ikut lebar layar, dikasih batas atas
+    // biar di tablet ga jadi raksasa.
+    final ringSize = (size.width * 0.62).clamp(200.0, 260.0);
+
     return Scaffold(
       backgroundColor: const Color(0xffF8FAF9),
 
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xff35694A),
         onPressed: _openAddDrinkScreen,
-        child: const Icon(Icons.add, color: Colors.white, size: 34),
+        child: const Icon(Icons.add, color: Colors.white, size: 28),
       ),
 
       bottomNavigationBar: BottomNavbar(
@@ -114,21 +115,18 @@ class _WaterScreenState extends State<WaterScreen> {
                 MaterialPageRoute(builder: (_) => DashboardScreen()),
               );
               break;
-
             case 1:
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (_) => const ActivityScreen()),
               );
               break;
-
             case 2:
               break;
-
             case 3:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const StatisticsScreen()),
+                MaterialPageRoute(builder: (_) => const MoodScreen()),
               );
               break;
             case 4:
@@ -143,7 +141,7 @@ class _WaterScreenState extends State<WaterScreen> {
 
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.symmetric(horizontal: hPad, vertical: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -151,103 +149,109 @@ class _WaterScreenState extends State<WaterScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Icon(Icons.person_outline, size: 30),
+                  Icon(Icons.person_outline, size: isSmall ? 24 : 28),
                   Row(
                     children: [
                       Container(
-                        width: 34,
-                        height: 34,
+                        width: 30,
+                        height: 30,
                         decoration: BoxDecoration(
                           color: const Color(0xff35694A),
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(9),
                         ),
                         child: const Icon(
                           Icons.self_improvement,
                           color: Colors.white,
-                          size: 18,
+                          size: 16,
                         ),
                       ),
                       const SizedBox(width: 8),
-                      const Text(
+                      Text(
                         "ZenFit",
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: isSmall ? 18 : 20,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xff35694A),
+                          color: const Color(0xff35694A),
                         ),
                       ),
                     ],
                   ),
-                  const Icon(Icons.notifications_none, size: 30),
+                  Icon(Icons.notifications_none, size: isSmall ? 24 : 28),
                 ],
               ),
 
-              const SizedBox(height: 45),
+              const SizedBox(height: 28),
 
-              const Text(
+              Text(
                 "Target Hidrasi Harian",
-                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-              ),
-
-              const SizedBox(height: 18),
-
-              const Text(
-                "Tetap terhidrasi untuk menjaga fokus dan\nketenangan.",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 20,
-                  color: Colors.black54,
-                  height: 1.5,
+                  fontSize: isSmall ? 24 : 26,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
 
-              const SizedBox(height: 40),
+              const SizedBox(height: 10),
+
+              Text(
+                "Tetap terhidrasi untuk menjaga fokus dan\nketenangan.",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: isSmall ? 13 : 14,
+                  color: Colors.black54,
+                  height: 1.4,
+                ),
+              ),
+
+              const SizedBox(height: 30),
 
               //================ PROGRESS =================
               Container(
-                width: 330,
-                height: 330,
+                width: ringSize,
+                height: ringSize,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: const Color(0xff5A84AC), width: 18),
+                  border: Border.all(color: const Color(0xff5A84AC), width: 14),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Icon(
                       Icons.water_drop,
-                      size: 45,
+                      size: 32,
                       color: Color(0xff35694A),
                     ),
-                    const SizedBox(height: 18),
-                    RichText(
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                            // Was hardcoded to "2000" regardless of progress.
-                            text: "$consumedMl",
-                            style: const TextStyle(
-                              fontSize: 72,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xff7A9ABB),
+                    const SizedBox(height: 10),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: "$consumedMl",
+                              style: const TextStyle(
+                                fontSize: 46,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xff7A9ABB),
+                              ),
                             ),
-                          ),
-                          const TextSpan(
-                            text: " ml",
-                            style: TextStyle(
-                              fontSize: 34,
-                              color: Color(0xff7A9ABB),
-                              fontWeight: FontWeight.bold,
+                            const TextSpan(
+                              text: " ml",
+                              style: TextStyle(
+                                fontSize: 22,
+                                color: Color(0xff7A9ABB),
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 6),
                     Text(
                       "/ $targetMl ml",
                       style: const TextStyle(
-                        fontSize: 28,
+                        fontSize: 17,
                         color: Colors.black54,
                       ),
                     ),
@@ -255,106 +259,116 @@ class _WaterScreenState extends State<WaterScreen> {
                 ),
               ),
 
-              const SizedBox(height: 35),
+              const SizedBox(height: 26),
 
               Container(
+                width: double.infinity,
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 14,
+                  horizontal: 16,
+                  vertical: 12,
                 ),
                 decoration: BoxDecoration(
                   color: const Color(0xffEDF5EF),
-                  borderRadius: BorderRadius.circular(30),
+                  borderRadius: BorderRadius.circular(24),
                 ),
                 child: Row(
-                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.trending_up, color: Color(0xff5A845F)),
+                    const Icon(
+                      Icons.trending_up,
+                      color: Color(0xff5A845F),
+                      size: 20,
+                    ),
                     const SizedBox(width: 10),
-                    Text(
-                      // Was hardcoded to "60%" even though the circle above
-                      // always showed 2000/2000 (100%). Now both use the
-                      // same consumedMl/targetMl source.
-                      "Kamu mencapai $percent% dari target hari ini",
-                      style: const TextStyle(
-                        color: Color(0xff6C9275),
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
+                    Expanded(
+                      child: Text(
+                        "Kamu mencapai $percent% dari target hari ini",
+                        style: const TextStyle(
+                          color: Color(0xff6C9275),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
 
-              const SizedBox(height: 40),
+              const SizedBox(height: 28),
 
               //================ QUICK ADD =================
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(28),
+                  borderRadius: BorderRadius.circular(22),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(.05),
-                      blurRadius: 18,
-                      offset: const Offset(0, 8),
+                      blurRadius: 14,
+                      offset: const Offset(0, 6),
                     ),
                   ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       "Tambah Cepat",
                       style: TextStyle(
-                        fontSize: 28,
+                        fontSize: isSmall ? 18 : 19,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 25),
+                    const SizedBox(height: 16),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        WaterOption(
-                          icon: Icons.local_cafe_outlined,
-                          amount: "250 ml",
-                          selected: selectedQuickAdd == 0,
-                          onTap: () {
-                            setState(() => selectedQuickAdd = 0);
-                            _addWater(
-                              250,
-                              icon: Icons.local_cafe_outlined,
-                              title: "Air",
-                            );
-                          },
+                        Expanded(
+                          child: WaterOption(
+                            icon: Icons.local_cafe_outlined,
+                            amount: "250 ml",
+                            selected: selectedQuickAdd == 0,
+                            onTap: () {
+                              setState(() => selectedQuickAdd = 0);
+                              _addWater(
+                                250,
+                                icon: Icons.local_cafe_outlined,
+                                title: "Air",
+                              );
+                            },
+                          ),
                         ),
-                        WaterOption(
-                          icon: Icons.local_drink_outlined,
-                          amount: "500 ml",
-                          selected: selectedQuickAdd == 1,
-                          onTap: () {
-                            setState(() => selectedQuickAdd = 1);
-                            _addWater(
-                              500,
-                              icon: Icons.local_drink_outlined,
-                              title: "Air",
-                            );
-                          },
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: WaterOption(
+                            icon: Icons.local_drink_outlined,
+                            amount: "500 ml",
+                            selected: selectedQuickAdd == 1,
+                            onTap: () {
+                              setState(() => selectedQuickAdd = 1);
+                              _addWater(
+                                500,
+                                icon: Icons.local_drink_outlined,
+                                title: "Air",
+                              );
+                            },
+                          ),
                         ),
-                        WaterOption(
-                          icon: Icons.blender_outlined,
-                          amount: "750 ml",
-                          selected: selectedQuickAdd == 2,
-                          onTap: () {
-                            setState(() => selectedQuickAdd = 2);
-                            _addWater(
-                              750,
-                              icon: Icons.blender_outlined,
-                              title: "Air",
-                            );
-                          },
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: WaterOption(
+                            icon: Icons.blender_outlined,
+                            amount: "750 ml",
+                            selected: selectedQuickAdd == 2,
+                            onTap: () {
+                              setState(() => selectedQuickAdd = 2);
+                              _addWater(
+                                750,
+                                icon: Icons.blender_outlined,
+                                title: "Air",
+                              );
+                            },
+                          ),
                         ),
                       ],
                     ),
@@ -362,20 +376,20 @@ class _WaterScreenState extends State<WaterScreen> {
                 ),
               ),
 
-              const SizedBox(height: 35),
+              const SizedBox(height: 26),
 
               //================ HISTORY =================
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(28),
+                  borderRadius: BorderRadius.circular(22),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(.05),
-                      blurRadius: 18,
-                      offset: const Offset(0, 8),
+                      blurRadius: 14,
+                      offset: const Offset(0, 6),
                     ),
                   ],
                 ),
@@ -383,32 +397,34 @@ class _WaterScreenState extends State<WaterScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          "Riwayat Hari Ini",
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
+                        Expanded(
+                          child: Text(
+                            "Riwayat Hari Ini",
+                            style: TextStyle(
+                              fontSize: isSmall ? 16 : 17,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                         TextButton(
                           onPressed: () {},
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            minimumSize: const Size(0, 0),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
                           child: const Text(
                             "Lihat Semua",
                             style: TextStyle(
-                              fontSize: 18,
+                              fontSize: 13,
                               color: Color(0xff35694A),
                             ),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 15),
-                    // Was two hardcoded WaterHistoryTile widgets that never
-                    // changed no matter what you added. Now built from the
-                    // history list so quick-add and AddDrinkScreen entries
-                    // actually show up.
+                    const SizedBox(height: 10),
                     for (int i = 0; i < history.length; i++) ...[
                       WaterHistoryTile(
                         icon: history[i].icon,
@@ -422,7 +438,7 @@ class _WaterScreenState extends State<WaterScreen> {
                 ),
               ),
 
-              const SizedBox(height: 40),
+              const SizedBox(height: 24),
             ],
           ),
         ),

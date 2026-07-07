@@ -58,7 +58,6 @@ class DashboardScreen extends StatelessWidget {
                 title: const Text("Log Activity"),
                 onTap: () {
                   Navigator.pop(context);
-
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const ActivityScreen()),
@@ -73,10 +72,10 @@ class DashboardScreen extends StatelessWidget {
                 title: const Text("Log Mood"),
                 onTap: () {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Mood logging screen not built yet"),
-                    ),
+                  // PERBAIKAN: dulu cuma nampilin snackbar, sekarang beneran ke MoodScreen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const MoodScreen()),
                   );
                 },
               ),
@@ -90,11 +89,15 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final isSmall = size.width < 380;
+    final hPad = size.width * 0.055;
+
     return Scaffold(
       backgroundColor: const Color(0xffF7F9F8),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 20),
+          padding: EdgeInsets.symmetric(horizontal: hPad, vertical: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -103,7 +106,9 @@ class DashboardScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.person_outline, size: 32),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    icon: Icon(Icons.person_outline, size: isSmall ? 26 : 28),
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -121,36 +126,35 @@ class DashboardScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Container(
-                              padding: const EdgeInsets.all(6),
+                              padding: const EdgeInsets.all(5),
                               decoration: BoxDecoration(
                                 color: const Color(0xff35694A),
-                                borderRadius: BorderRadius.circular(10),
+                                borderRadius: BorderRadius.circular(9),
                               ),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.self_improvement,
                                 color: Colors.white,
+                                size: isSmall ? 16 : 18,
                               ),
                             ),
-
-                            const SizedBox(width: 10),
-
-                            const Text(
+                            const SizedBox(width: 8),
+                            Text(
                               "ZenFit",
                               style: TextStyle(
-                                fontSize: 26,
+                                fontSize: isSmall ? 18 : 20,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xff35694A),
+                                color: const Color(0xff35694A),
                               ),
                             ),
                           ],
                         ),
-
-                        const SizedBox(height: 6),
-
+                        const SizedBox(height: 4),
                         Text(
                           user?.email ?? "",
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                            fontSize: 14,
+                            fontSize: 12,
                             color: Colors.black54,
                           ),
                         ),
@@ -159,6 +163,7 @@ class DashboardScreen extends StatelessWidget {
                   ),
 
                   PopupMenuButton<String>(
+                    padding: EdgeInsets.zero,
                     icon: const Icon(Icons.more_vert),
                     onSelected: (value) async {
                       if (value == "notification") {
@@ -195,27 +200,28 @@ class DashboardScreen extends StatelessWidget {
                 ],
               ),
 
-              const SizedBox(height: 35),
-
-              const SizedBox(height: 30),
+              const SizedBox(height: 28),
 
               Text(
                 "Good Morning,\n${user?.displayName ?? user?.email ?? 'User'} 👋",
-                style: const TextStyle(
-                  fontSize: 36,
+                style: TextStyle(
+                  fontSize: isSmall ? 26 : 28,
                   fontWeight: FontWeight.bold,
                   height: 1.2,
                 ),
               ),
 
-              const SizedBox(height: 10),
+              const SizedBox(height: 8),
 
-              const Text(
+              Text(
                 "Your daily wellness summary is ready.",
-                style: TextStyle(fontSize: 18, color: Colors.black54),
+                style: TextStyle(
+                  fontSize: isSmall ? 14 : 15,
+                  color: Colors.black54,
+                ),
               ),
 
-              const SizedBox(height: 35),
+              const SizedBox(height: 26),
 
               //================ WATER REMINDER ================
               DashboardCard(
@@ -233,24 +239,30 @@ class DashboardScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(30),
                       child: const LinearProgressIndicator(
                         value: .48,
-                        minHeight: 10,
+                        minHeight: 8,
                         backgroundColor: Colors.white,
                         valueColor: AlwaysStoppedAnimation(Color(0xff2C6C72)),
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 10),
                     const Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("0 L", style: TextStyle(color: Colors.black54)),
-                        Text("2.5 L", style: TextStyle(color: Colors.black54)),
+                        Text(
+                          "0 L",
+                          style: TextStyle(color: Colors.black54, fontSize: 13),
+                        ),
+                        Text(
+                          "2.5 L",
+                          style: TextStyle(color: Colors.black54, fontSize: 13),
+                        ),
                       ],
                     ),
                   ],
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
               //================ ACTIVITY ================
               StreamBuilder<List<ActivityModel>>(
@@ -270,7 +282,6 @@ class DashboardScreen extends StatelessWidget {
                   }
 
                   final activities = snapshot.data!;
-
                   final latest = activities.first;
 
                   final totalMinutes = activities.fold<int>(
@@ -291,7 +302,7 @@ class DashboardScreen extends StatelessWidget {
                 },
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
               //================ MOOD ================
               const DashboardCard(
@@ -305,30 +316,36 @@ class DashboardScreen extends StatelessWidget {
                 borderColor: Color(0xffECECEC),
               ),
 
-              const SizedBox(height: 35),
+              const SizedBox(height: 28),
 
               //================ HISTORY =================
-              const Text(
+              Text(
                 "History Activity",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: isSmall ? 19 : 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
 
-              const SizedBox(height: 18),
+              const SizedBox(height: 14),
 
               StreamBuilder<List<ActivityModel>>(
                 stream: ActivityService().getActivities(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 20),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
                   }
 
                   if (!snapshot.hasData || snapshot.data!.isEmpty) {
                     return Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.all(24),
+                      padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(24),
+                        borderRadius: BorderRadius.circular(20),
                       ),
                       child: const Center(child: Text("Belum ada activity")),
                     );
@@ -337,15 +354,15 @@ class DashboardScreen extends StatelessWidget {
                   final activities = snapshot.data!;
 
                   return Container(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(24),
+                      borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(.05),
-                          blurRadius: 18,
-                          offset: const Offset(0, 8),
+                          blurRadius: 14,
+                          offset: const Offset(0, 6),
                         ),
                       ],
                     ),
@@ -372,33 +389,37 @@ class DashboardScreen extends StatelessWidget {
                 },
               ),
 
+              const SizedBox(height: 28),
+
               //================ WEEKLY STATISTICS =================
-              const Text(
+              Text(
                 "Weekly Statistics",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: isSmall ? 19 : 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
 
-              const SizedBox(height: 25),
+              const SizedBox(height: 18),
 
               StreamBuilder<List<ActivityModel>>(
                 stream: ActivityService().getActivities(),
                 builder: (context, snapshot) {
-                  final heights = List<double>.filled(7, 20);
+                  final heights = List<double>.filled(7, 16);
 
                   if (snapshot.hasData) {
                     for (var item in snapshot.data!) {
                       final day = item.date.weekday - 1;
-
                       heights[day] += item.duration.toDouble();
 
-                      if (heights[day] > 160) {
-                        heights[day] = 160;
+                      if (heights[day] > 130) {
+                        heights[day] = 130;
                       }
                     }
                   }
 
                   return SizedBox(
-                    height: 180,
+                    height: 150,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       crossAxisAlignment: CrossAxisAlignment.end,
@@ -416,27 +437,29 @@ class DashboardScreen extends StatelessWidget {
                 },
               ),
 
+              const SizedBox(height: 24),
+
               //================ BUTTON NEW ACTIVITY =================
               SizedBox(
                 width: double.infinity,
-                height: 60,
+                height: 52,
                 child: ElevatedButton.icon(
                   onPressed: () => _openQuickAddSheet(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xff35694A),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24),
+                      borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  icon: const Icon(Icons.add, color: Colors.white),
+                  icon: const Icon(Icons.add, color: Colors.white, size: 20),
                   label: const Text(
                     "New Activity",
-                    style: TextStyle(color: Colors.white, fontSize: 18),
+                    style: TextStyle(color: Colors.white, fontSize: 15),
                   ),
                 ),
               ),
 
-              const SizedBox(height: 40),
+              const SizedBox(height: 24),
             ],
           ),
         ),
@@ -458,21 +481,18 @@ class DashboardScreen extends StatelessWidget {
                 MaterialPageRoute(builder: (_) => const ActivityScreen()),
               );
               break;
-
             case 2:
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (_) => const WaterScreen()),
               );
               break;
-
             case 3:
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (_) => const MoodScreen()),
               );
               break;
-
             case 4:
               Navigator.pushReplacement(
                 context,

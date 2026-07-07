@@ -45,7 +45,6 @@ class _ActivityScreenState extends State<ActivityScreen> {
 
   final notesController = TextEditingController();
 
-  // Menambahkan dispose untuk membersihkan controller dari memori
   @override
   void dispose() {
     dateController.dispose();
@@ -55,12 +54,15 @@ class _ActivityScreenState extends State<ActivityScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final isSmall = size.width < 380;
+    final hPad = size.width * 0.055;
+
     return Scaffold(
       backgroundColor: const Color(0xffF8FAF9),
-      // BODY UTAMA
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.symmetric(horizontal: hPad, vertical: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -68,155 +70,129 @@ class _ActivityScreenState extends State<ActivityScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Icon(Icons.person_outline, size: 30),
+                  Icon(Icons.person_outline, size: isSmall ? 24 : 28),
                   Row(
                     children: [
                       Container(
-                        width: 34,
-                        height: 34,
+                        width: 30,
+                        height: 30,
                         decoration: BoxDecoration(
                           color: const Color(0xff4F7F5D),
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(9),
                         ),
                         child: const Icon(
                           Icons.self_improvement,
                           color: Colors.white,
-                          size: 18,
+                          size: 16,
                         ),
                       ),
                       const SizedBox(width: 8),
-                      const Text(
+                      Text(
                         "ZenFit",
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: isSmall ? 18 : 20,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xff35694A),
+                          color: const Color(0xff35694A),
                         ),
                       ),
                     ],
                   ),
-                  const Icon(Icons.notifications_none, size: 30),
+                  Icon(Icons.notifications_none, size: isSmall ? 24 : 28),
                 ],
               ),
 
-              const SizedBox(height: 35),
+              const SizedBox(height: 26),
 
-              const Text(
+              Text(
                 "Log Activity",
-                style: TextStyle(fontSize: 38, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: isSmall ? 28 : 30,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
 
-              const Text(
+              Text(
                 "What did you practice today?",
-                style: TextStyle(fontSize: 20, color: Colors.black54),
+                style: TextStyle(
+                  fontSize: isSmall ? 14 : 15,
+                  color: Colors.black54,
+                ),
               ),
 
-              const SizedBox(height: 35),
+              const SizedBox(height: 26),
 
               //================ ACTIVITY GRID =================
               Wrap(
-                spacing: 18,
-                runSpacing: 18,
+                spacing: 12,
+                runSpacing: 12,
                 children: [
                   ActivityItem(
                     icon: Icons.directions_walk,
                     title: "Walking",
                     selected: selectedActivity == 0,
-                    onTap: () {
-                      setState(() {
-                        selectedActivity = 0;
-                      });
-                    },
+                    onTap: () => setState(() => selectedActivity = 0),
                   ),
                   ActivityItem(
                     icon: Icons.directions_run,
                     title: "Running",
                     selected: selectedActivity == 1,
-                    onTap: () {
-                      setState(() {
-                        selectedActivity = 1;
-                      });
-                    },
+                    onTap: () => setState(() => selectedActivity = 1),
                   ),
                   ActivityItem(
                     icon: Icons.pedal_bike,
                     title: "Cycling",
                     selected: selectedActivity == 2,
-                    onTap: () {
-                      setState(() {
-                        selectedActivity = 2;
-                      });
-                    },
+                    onTap: () => setState(() => selectedActivity = 2),
                   ),
                   ActivityItem(
                     icon: Icons.self_improvement,
                     title: "Yoga",
                     selected: selectedActivity == 3,
-                    onTap: () {
-                      setState(() {
-                        selectedActivity = 3;
-                      });
-                    },
+                    onTap: () => setState(() => selectedActivity = 3),
                   ),
                   ActivityItem(
                     icon: Icons.pool,
                     title: "Swimming",
                     selected: selectedActivity == 4,
-                    onTap: () {
-                      setState(() {
-                        selectedActivity = 4;
-                      });
-                    },
+                    onTap: () => setState(() => selectedActivity = 4),
                   ),
                   ActivityItem(
                     icon: Icons.fitness_center,
                     title: "Weights",
                     selected: selectedActivity == 5,
-                    onTap: () {
-                      setState(() {
-                        selectedActivity = 5;
-                      });
-                    },
+                    onTap: () => setState(() => selectedActivity = 5),
                   ),
                   ActivityItem(
                     icon: Icons.timer,
                     title: "HIIT",
                     selected: selectedActivity == 6,
-                    onTap: () {
-                      setState(() {
-                        selectedActivity = 6;
-                      });
-                    },
+                    onTap: () => setState(() => selectedActivity = 6),
                   ),
                   ActivityItem(
                     icon: Icons.accessibility_new,
                     title: "Pilates",
                     selected: selectedActivity == 7,
-                    onTap: () {
-                      setState(() {
-                        selectedActivity = 7;
-                      });
-                    },
+                    onTap: () => setState(() => selectedActivity = 7),
                   ),
                 ],
               ),
 
-              const SizedBox(height: 35),
+              const SizedBox(height: 26),
 
               //================ FORM CARD =================
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(28),
+                  borderRadius: BorderRadius.circular(22),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(.05),
-                      blurRadius: 20,
-                      offset: const Offset(0, 10),
+                      blurRadius: 16,
+                      offset: const Offset(0, 8),
                     ),
                   ],
                 ),
@@ -226,24 +202,24 @@ class _ActivityScreenState extends State<ActivityScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
+                        Text(
                           "Duration",
                           style: TextStyle(
-                            fontSize: 24,
+                            fontSize: isSmall ? 18 : 19,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
                           "${duration.round()} min",
                           style: const TextStyle(
-                            fontSize: 22,
+                            fontSize: 17,
                             fontWeight: FontWeight.bold,
                             color: Color(0xff35694A),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 25),
+                    const SizedBox(height: 16),
                     Slider(
                       value: duration,
                       min: 5,
@@ -257,30 +233,34 @@ class _ActivityScreenState extends State<ActivityScreen> {
                     ),
                     const Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [Text("5m"), Text("3h")],
+                      children: [
+                        Text("5m", style: TextStyle(fontSize: 13)),
+                        Text("3h", style: TextStyle(fontSize: 13)),
+                      ],
                     ),
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 22),
 
                     //================ DATE =================
-                    const Text(
+                    Text(
                       "Date",
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: isSmall ? 15 : 16,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 10),
                     TextField(
                       controller: dateController,
                       readOnly: true,
+                      style: const TextStyle(fontSize: 14),
                       decoration: InputDecoration(
-                        suffixIcon: const Icon(Icons.calendar_today),
+                        suffixIcon: const Icon(Icons.calendar_today, size: 20),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(18),
+                          borderRadius: BorderRadius.circular(14),
                         ),
                         contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 18,
+                          horizontal: 16,
+                          vertical: 14,
                         ),
                       ),
                       onTap: () async {
@@ -300,27 +280,31 @@ class _ActivityScreenState extends State<ActivityScreen> {
                         }
                       },
                     ),
-                    const SizedBox(height: 25),
+                    const SizedBox(height: 20),
 
                     //================ INTENSITY =================
-                    const Text(
+                    Text(
                       "Intensity",
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: isSmall ? 15 : 16,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 10),
 
                     DropdownButtonFormField<String>(
                       value: selectedIntensity,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.black87,
+                      ),
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(18),
+                          borderRadius: BorderRadius.circular(14),
                         ),
                         contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 18,
+                          horizontal: 16,
+                          vertical: 14,
                         ),
                       ),
                       items: const [
@@ -344,37 +328,39 @@ class _ActivityScreenState extends State<ActivityScreen> {
                       },
                     ),
 
-                    const SizedBox(height: 25),
+                    const SizedBox(height: 20),
                     //================ NOTES =================
-                    const Text(
+                    Text(
                       "Mindful Notes",
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: isSmall ? 15 : 16,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 10),
                     TextField(
                       controller: notesController,
-                      maxLines: 5,
+                      maxLines: 4,
+                      style: const TextStyle(fontSize: 14),
                       decoration: InputDecoration(
                         hintText: "How did you feel during this movement?",
+                        hintStyle: const TextStyle(fontSize: 13),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(18),
+                          borderRadius: BorderRadius.circular(14),
                         ),
-                        contentPadding: const EdgeInsets.all(20),
+                        contentPadding: const EdgeInsets.all(14),
                       ),
                     ),
                   ],
                 ),
               ),
 
-              const SizedBox(height: 40),
+              const SizedBox(height: 28),
 
               //================ BUTTON CANCEL =================
               SizedBox(
                 width: double.infinity,
-                height: 60,
+                height: 52,
                 child: OutlinedButton(
                   onPressed: () {
                     Navigator.pop(context);
@@ -382,22 +368,22 @@ class _ActivityScreenState extends State<ActivityScreen> {
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: Color(0xff35694A), width: 2),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+                      borderRadius: BorderRadius.circular(26),
                     ),
                   ),
                   child: const Text(
                     "Cancel",
-                    style: TextStyle(fontSize: 20, color: Color(0xff35694A)),
+                    style: TextStyle(fontSize: 16, color: Color(0xff35694A)),
                   ),
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 14),
 
               //================ BUTTON SAVE =================
               SizedBox(
                 width: double.infinity,
-                height: 60,
+                height: 52,
                 child: ElevatedButton(
                   onPressed: () async {
                     if (notesController.text.trim().isEmpty) {
@@ -447,18 +433,17 @@ class _ActivityScreenState extends State<ActivityScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xff5A845F),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+                      borderRadius: BorderRadius.circular(26),
                     ),
                   ),
                   child: const Text(
                     "Save Activity",
-                    style: TextStyle(color: Colors.white, fontSize: 20),
+                    style: TextStyle(color: Colors.white, fontSize: 16),
                   ),
                 ),
               ),
 
-              // Memberikan jarak bawah agar tidak tertutup navbar
-              const SizedBox(height: 40),
+              const SizedBox(height: 24),
             ],
           ),
         ),
@@ -474,29 +459,26 @@ class _ActivityScreenState extends State<ActivityScreen> {
                 MaterialPageRoute(builder: (_) => DashboardScreen()),
               );
               break;
-
             case 1:
               break;
-
             case 2:
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (_) => const WaterScreen()),
               );
               break;
-
             case 3:
+              // PERBAIKAN: sebelumnya index 3 (Mood) malah nge-push ke
+              // StatisticsScreen, sekarang bener ke MoodScreen.
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const StatisticsScreen()),
+                MaterialPageRoute(builder: (_) => const MoodScreen()),
               );
               break;
             case 4:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => const StatisticsScreen(),
-                ), // sebelumnya tidak ada case ini
+                MaterialPageRoute(builder: (_) => const StatisticsScreen()),
               );
               break;
           }
