@@ -9,6 +9,7 @@ import '../../widgets/stats_summary_tile.dart';
 import '../activity/activity_screen.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../water/water_screen.dart';
+import '../mood/mood_screen.dart';
 
 class StatisticsScreen extends StatefulWidget {
   const StatisticsScreen({super.key});
@@ -25,9 +26,9 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     return Scaffold(
       backgroundColor: const Color(0xffF8FAF9),
       bottomNavigationBar: BottomNavbar(
-        currentIndex: 3,
+        currentIndex: 4,
         onTap: (index) {
-          if (index == 3) return; // Mencegah navigasi ulang ke diri sendiri
+          if (index == 4) return; // Mencegah navigasi ulang ke diri sendiri
 
           Widget targetScreen;
           switch (index) {
@@ -39,6 +40,10 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
               break;
             case 2:
               targetScreen = const WaterScreen();
+              break;
+            case 3:
+              targetScreen =
+                  const MoodScreen(); // sebelumnya tidak ada, jatuh ke default: return
               break;
             default:
               return;
@@ -297,89 +302,79 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                 unit: "times",
               ),
               const SizedBox(height: 20),
-const StatsSummaryTile(
-  icon: Icons.nightlight_round,
-  iconBg: Color(0xffECECEC),
-  iconColor: Colors.blueGrey,
-  title: "Sleep",
-  value: "7.2",
-  unit: "hr/night",
-),
-
-const SizedBox(height: 40),
-
-const Text(
-  "Activity History",
-  style: TextStyle(
-    fontSize: 28,
-    fontWeight: FontWeight.bold,
-  ),
-),
-
-const SizedBox(height: 20),
-
-StreamBuilder<List<ActivityModel>>(
-  stream: ActivityService().getActivities(),
-  builder: (context, snapshot) {
-    if (snapshot.connectionState == ConnectionState.waiting) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
-    }
-
-    if (snapshot.hasError) {
-      return Text(snapshot.error.toString());
-    }
-
-    if (!snapshot.hasData || snapshot.data!.isEmpty) {
-      return const Center(
-        child: Text("Belum ada activity"),
-      );
-    }
-
-    final activities = snapshot.data!;
-
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: activities.length,
-      itemBuilder: (context, index) {
-        final item = activities[index];
-
-        return Card(
-          margin: const EdgeInsets.only(bottom: 12),
-          child: ListTile(
-            leading: const CircleAvatar(
-              child: Icon(Icons.fitness_center),
-            ),
-            title: Text(item.activity),
-            subtitle: Text(
-              "${item.duration} menit\n"
-              "${item.intensity}\n"
-              "${item.date.day}/${item.date.month}/${item.date.year}",
-            ),
-            isThreeLine: true,
-            trailing: IconButton(
-              icon: const Icon(
-                Icons.delete,
-                color: Colors.red,
+              const StatsSummaryTile(
+                icon: Icons.nightlight_round,
+                iconBg: Color(0xffECECEC),
+                iconColor: Colors.blueGrey,
+                title: "Sleep",
+                value: "7.2",
+                unit: "hr/night",
               ),
-              onPressed: () async {
-                await ActivityService().deleteActivity(item.id!);
-              },
-            ),
-          ),
-        );
-      },
-    );
-  },
-),
 
-const SizedBox(height: 40),
-],
-),
-),
-),
+              const SizedBox(height: 40),
+
+              const Text(
+                "Activity History",
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              ),
+
+              const SizedBox(height: 20),
+
+              StreamBuilder<List<ActivityModel>>(
+                stream: ActivityService().getActivities(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (snapshot.hasError) {
+                    return Text(snapshot.error.toString());
+                  }
+
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: Text("Belum ada activity"));
+                  }
+
+                  final activities = snapshot.data!;
+
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: activities.length,
+                    itemBuilder: (context, index) {
+                      final item = activities[index];
+
+                      return Card(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        child: ListTile(
+                          leading: const CircleAvatar(
+                            child: Icon(Icons.fitness_center),
+                          ),
+                          title: Text(item.activity),
+                          subtitle: Text(
+                            "${item.duration} menit\n"
+                            "${item.intensity}\n"
+                            "${item.date.day}/${item.date.month}/${item.date.year}",
+                          ),
+                          isThreeLine: true,
+                          trailing: IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () async {
+                              await ActivityService().deleteActivity(item.id!);
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+
+              const SizedBox(height: 40),
+            ],
+          ),
+        ),
+      ),
     );
   }
 

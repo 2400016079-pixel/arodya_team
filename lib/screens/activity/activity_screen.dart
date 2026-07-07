@@ -9,6 +9,8 @@ import '../../widgets/bottom_navbar.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../water/water_screen.dart';
 import '../statistics/statistics_screen.dart';
+import '../mood/mood_screen.dart';
+
 class ActivityScreen extends StatefulWidget {
   const ActivityScreen({super.key});
 
@@ -20,28 +22,28 @@ class _ActivityScreenState extends State<ActivityScreen> {
   int selectedActivity = 0;
 
   final List<String> activityList = [
-  "Walking",
-  "Running",
-  "Cycling",
-  "Yoga",
-  "Swimming",
-  "Weights",
-  "HIIT",
-  "Pilates",
+    "Walking",
+    "Running",
+    "Cycling",
+    "Yoga",
+    "Swimming",
+    "Weights",
+    "HIIT",
+    "Pilates",
   ];
 
-double duration = 45;
+  double duration = 45;
 
-DateTime selectedDate = DateTime.now();
+  DateTime selectedDate = DateTime.now();
 
-String selectedIntensity = "Sedang";
+  String selectedIntensity = "Sedang";
 
-final dateController = TextEditingController(
-  text:
-      "${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}",
-);
+  final dateController = TextEditingController(
+    text:
+        "${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}",
+  );
 
-final notesController = TextEditingController();
+  final notesController = TextEditingController();
 
   // Menambahkan dispose untuk membersihkan controller dari memori
   @override
@@ -269,80 +271,80 @@ final notesController = TextEditingController();
                     ),
                     const SizedBox(height: 12),
                     TextField(
-  controller: dateController,
-  readOnly: true,
-  decoration: InputDecoration(
-    suffixIcon: const Icon(Icons.calendar_today),
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(18),
-    ),
-    contentPadding: const EdgeInsets.symmetric(
-      horizontal: 20,
-      vertical: 18,
-    ),
-  ),
-  onTap: () async {
-    DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: selectedDate,
-      firstDate: DateTime(2024),
-      lastDate: DateTime(2035),
-    );
+                      controller: dateController,
+                      readOnly: true,
+                      decoration: InputDecoration(
+                        suffixIcon: const Icon(Icons.calendar_today),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 18,
+                        ),
+                      ),
+                      onTap: () async {
+                        DateTime? pickedDate = await showDatePicker(
+                          context: context,
+                          initialDate: selectedDate,
+                          firstDate: DateTime(2024),
+                          lastDate: DateTime(2035),
+                        );
 
-    if (pickedDate != null) {
-      setState(() {
-        selectedDate = pickedDate;
-        dateController.text =
-            "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
-      });
-    }
-  },
-),
+                        if (pickedDate != null) {
+                          setState(() {
+                            selectedDate = pickedDate;
+                            dateController.text =
+                                "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
+                          });
+                        }
+                      },
+                    ),
                     const SizedBox(height: 25),
 
                     //================ INTENSITY =================
-const Text(
-  "Intensity",
-  style: TextStyle(
-    fontSize: 20,
-    fontWeight: FontWeight.w600,
-  ),
-),
-const SizedBox(height: 12),
+                    const Text(
+                      "Intensity",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
 
-DropdownButtonFormField<String>(
-  value: selectedIntensity,
-  decoration: InputDecoration(
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(18),
-    ),
-    contentPadding: const EdgeInsets.symmetric(
-      horizontal: 20,
-      vertical: 18,
-    ),
-  ),
-  items: const [
-    DropdownMenuItem(
-      value: "Ringan",
-      child: Text("Ringan"),
-    ),
-    DropdownMenuItem(
-      value: "Sedang",
-      child: Text("Sedang"),
-    ),
-    DropdownMenuItem(
-      value: "Tinggi",
-      child: Text("Tinggi"),
-    ),
-  ],
-  onChanged: (value) {
-    setState(() {
-      selectedIntensity = value!;
-    });
-  },
-),
+                    DropdownButtonFormField<String>(
+                      value: selectedIntensity,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 18,
+                        ),
+                      ),
+                      items: const [
+                        DropdownMenuItem(
+                          value: "Ringan",
+                          child: Text("Ringan"),
+                        ),
+                        DropdownMenuItem(
+                          value: "Sedang",
+                          child: Text("Sedang"),
+                        ),
+                        DropdownMenuItem(
+                          value: "Tinggi",
+                          child: Text("Tinggi"),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          selectedIntensity = value!;
+                        });
+                      },
+                    ),
 
-const SizedBox(height: 25),
+                    const SizedBox(height: 25),
                     //================ NOTES =================
                     const Text(
                       "Mindful Notes",
@@ -397,51 +399,51 @@ const SizedBox(height: 25),
                 width: double.infinity,
                 height: 60,
                 child: ElevatedButton(
-                 onPressed: () async {
-  if (notesController.text.trim().isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Silakan isi Mindful Notes"),
-      ),
-    );
-    return;
-  }
+                  onPressed: () async {
+                    if (notesController.text.trim().isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Silakan isi Mindful Notes"),
+                        ),
+                      );
+                      return;
+                    }
 
-  final activity = ActivityModel(
-    activity: activityList[selectedActivity],
-    duration: duration.round(),
-    date: selectedDate,
-    intensity: selectedIntensity,
-    notes: notesController.text.trim(),
-    createdAt: Timestamp.now(),
-  );
+                    final activity = ActivityModel(
+                      activity: activityList[selectedActivity],
+                      duration: duration.round(),
+                      date: selectedDate,
+                      intensity: selectedIntensity,
+                      notes: notesController.text.trim(),
+                      createdAt: Timestamp.now(),
+                    );
 
-  final error = await ActivityService().addActivity(activity);
+                    final error = await ActivityService().addActivity(activity);
 
-  if (!mounted) return;
+                    if (!mounted) return;
 
-  if (error == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Activity berhasil disimpan"),
-      ),
-    );
+                    if (error == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Activity berhasil disimpan"),
+                        ),
+                      );
 
-    setState(() {
-      selectedActivity = 0;
-      duration = 45;
-      selectedDate = DateTime.now();
-      dateController.text =
-          "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}";
-      selectedIntensity = "Sedang";
-      notesController.clear();
-    });
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(error)),
-    );
-  }
-},
+                      setState(() {
+                        selectedActivity = 0;
+                        duration = 45;
+                        selectedDate = DateTime.now();
+                        dateController.text =
+                            "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}";
+                        selectedIntensity = "Sedang";
+                        notesController.clear();
+                      });
+                    } else {
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(SnackBar(content: Text(error)));
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xff5A845F),
                     shape: RoundedRectangleBorder(
@@ -487,6 +489,14 @@ const SizedBox(height: 25),
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (_) => const StatisticsScreen()),
+              );
+              break;
+            case 4:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const StatisticsScreen(),
+                ), // sebelumnya tidak ada case ini
               );
               break;
           }

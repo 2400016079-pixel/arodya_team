@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 class BottomNavbar extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTap;
@@ -21,7 +20,6 @@ class BottomNavbar extends StatelessWidget {
       height: 75,
 
       destinations: const [
-
         NavigationDestination(
           icon: Icon(Icons.home_outlined),
           selectedIcon: Icon(Icons.home),
@@ -41,11 +39,16 @@ class BottomNavbar extends StatelessWidget {
         ),
 
         NavigationDestination(
+          icon: Icon(Icons.sentiment_satisfied_outlined),
+          selectedIcon: Icon(Icons.sentiment_satisfied),
+          label: "Mood",
+        ),
+
+        NavigationDestination(
           icon: Icon(Icons.bar_chart_outlined),
           selectedIcon: Icon(Icons.bar_chart),
           label: "Stats",
         ),
-
       ],
     );
   }

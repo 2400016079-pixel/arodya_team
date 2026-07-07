@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-
+import '../dashboard/dashboard_screen.dart';
+import '../activity/activity_screen.dart';
+import '../water/water_screen.dart';
+import '../statistics/statistics_screen.dart';
 import '../../widgets/bottom_navbar.dart';
 import '../../widgets/mood_card.dart';
 import '../../widgets/factor_chip.dart';
@@ -34,15 +37,34 @@ class _MoodScreenState extends State<MoodScreen> {
         onTap: (index) {
           switch (index) {
             case 0:
-              Navigator.pop(context);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => DashboardScreen()),
+              );
               break;
+
             case 1:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const ActivityScreen()),
+              );
               break;
+
             case 2:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const WaterScreen()),
+              );
               break;
+
             case 3:
-              break;
+              break; // sudah di halaman Mood
+
             case 4:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const StatisticsScreen()),
+              );
               break;
           }
         },
@@ -57,10 +79,7 @@ class _MoodScreenState extends State<MoodScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Icon(
-                    Icons.person_outline,
-                    size: 30,
-                  ),
+                  const Icon(Icons.person_outline, size: 30),
                   Row(
                     children: [
                       Container(
@@ -87,10 +106,7 @@ class _MoodScreenState extends State<MoodScreen> {
                       ),
                     ],
                   ),
-                  const Icon(
-                    Icons.notifications_none,
-                    size: 30,
-                  ),
+                  const Icon(Icons.notifications_none, size: 30),
                 ],
               ),
 
@@ -115,10 +131,7 @@ class _MoodScreenState extends State<MoodScreen> {
                 child: Text(
                   "Take a moment to check in with yourself.",
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.black54,
-                  ),
+                  style: TextStyle(fontSize: 20, color: Colors.black54),
                 ),
               ),
 
@@ -227,7 +240,7 @@ class _MoodScreenState extends State<MoodScreen> {
               ),
 
               const SizedBox(height: 35),
-              
+
               //================ ADD NOTE =================
               Container(
                 width: double.infinity,
@@ -341,21 +354,16 @@ class _MoodScreenState extends State<MoodScreen> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.grey.shade400,
-                        ),
+                        border: Border.all(color: Colors.grey.shade400),
                       ),
-                      child: const Icon(
-                        Icons.add,
-                        size: 30,
-                      ),
+                      child: const Icon(Icons.add, size: 30),
                     ),
                   ),
                 ],
               ),
 
               const SizedBox(height: 70),
-              
+
               //================ SAVE BUTTON =================
               SizedBox(
                 width: double.infinity,
@@ -363,9 +371,7 @@ class _MoodScreenState extends State<MoodScreen> {
                 child: ElevatedButton(
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Mood berhasil disimpan"),
-                      ),
+                      const SnackBar(content: Text("Mood berhasil disimpan")),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -384,8 +390,8 @@ class _MoodScreenState extends State<MoodScreen> {
                   ),
                 ),
               ),
-              // PERBAIKAN 2: Jarak SizedBox bawah dikurangi sedikit agar pas dengan layout 
-              const SizedBox(height: 24), 
+              // PERBAIKAN 2: Jarak SizedBox bawah dikurangi sedikit agar pas dengan layout
+              const SizedBox(height: 24),
             ],
           ),
         ),

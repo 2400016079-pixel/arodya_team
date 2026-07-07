@@ -7,6 +7,7 @@ import 'add_drink_screen.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../activity/activity_screen.dart';
 import '../statistics/statistics_screen.dart';
+import '../mood/mood_screen.dart';
 
 class WaterScreen extends StatefulWidget {
   const WaterScreen({super.key});
@@ -56,7 +57,11 @@ class _WaterScreenState extends State<WaterScreen> {
   int get percent =>
       targetMl == 0 ? 0 : ((consumedMl / targetMl) * 100).clamp(0, 100).round();
 
-  void _addWater(int amount, {IconData icon = Icons.water_drop, String title = "Air"}) {
+  void _addWater(
+    int amount, {
+    IconData icon = Icons.water_drop,
+    String title = "Air",
+  }) {
     setState(() {
       consumedMl = (consumedMl + amount).clamp(0, targetMl * 2);
       history.insert(
@@ -96,49 +101,45 @@ class _WaterScreenState extends State<WaterScreen> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xff35694A),
         onPressed: _openAddDrinkScreen,
-        child: const Icon(
-          Icons.add,
-          color: Colors.white,
-          size: 34,
-        ),
+        child: const Icon(Icons.add, color: Colors.white, size: 34),
       ),
 
       bottomNavigationBar: BottomNavbar(
-  currentIndex: 2,
-  onTap: (index) {
-    switch (index) {
-      case 0:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => DashboardScreen(),
-          ),
-        );
-        break;
+        currentIndex: 2,
+        onTap: (index) {
+          switch (index) {
+            case 0:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => DashboardScreen()),
+              );
+              break;
 
-      case 1:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => const ActivityScreen(),
-          ),
-        );
-        break;
+            case 1:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const ActivityScreen()),
+              );
+              break;
 
-      case 2:
-        break;
+            case 2:
+              break;
 
-      case 3:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => const StatisticsScreen(),
-          ),
-        );
-        break;
-    }
-  },
-),
+            case 3:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const StatisticsScreen()),
+              );
+              break;
+            case 4:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const StatisticsScreen()),
+              );
+              break;
+          }
+        },
+      ),
 
       body: SafeArea(
         child: SingleChildScrollView(
@@ -150,10 +151,7 @@ class _WaterScreenState extends State<WaterScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Icon(
-                    Icons.person_outline,
-                    size: 30,
-                  ),
+                  const Icon(Icons.person_outline, size: 30),
                   Row(
                     children: [
                       Container(
@@ -180,10 +178,7 @@ class _WaterScreenState extends State<WaterScreen> {
                       ),
                     ],
                   ),
-                  const Icon(
-                    Icons.notifications_none,
-                    size: 30,
-                  ),
+                  const Icon(Icons.notifications_none, size: 30),
                 ],
               ),
 
@@ -191,10 +186,7 @@ class _WaterScreenState extends State<WaterScreen> {
 
               const Text(
                 "Target Hidrasi Harian",
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
               ),
 
               const SizedBox(height: 18),
@@ -217,10 +209,7 @@ class _WaterScreenState extends State<WaterScreen> {
                 height: 330,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    color: const Color(0xff5A84AC),
-                    width: 18,
-                  ),
+                  border: Border.all(color: const Color(0xff5A84AC), width: 18),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -262,7 +251,6 @@ class _WaterScreenState extends State<WaterScreen> {
                         color: Colors.black54,
                       ),
                     ),
-
                   ],
                 ),
               ),
@@ -281,10 +269,7 @@ class _WaterScreenState extends State<WaterScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
-                      Icons.trending_up,
-                      color: Color(0xff5A845F),
-                    ),
+                    const Icon(Icons.trending_up, color: Color(0xff5A845F)),
                     const SizedBox(width: 10),
                     Text(
                       // Was hardcoded to "60%" even though the circle above
@@ -338,7 +323,11 @@ class _WaterScreenState extends State<WaterScreen> {
                           selected: selectedQuickAdd == 0,
                           onTap: () {
                             setState(() => selectedQuickAdd = 0);
-                            _addWater(250, icon: Icons.local_cafe_outlined, title: "Air");
+                            _addWater(
+                              250,
+                              icon: Icons.local_cafe_outlined,
+                              title: "Air",
+                            );
                           },
                         ),
                         WaterOption(
@@ -347,7 +336,11 @@ class _WaterScreenState extends State<WaterScreen> {
                           selected: selectedQuickAdd == 1,
                           onTap: () {
                             setState(() => selectedQuickAdd = 1);
-                            _addWater(500, icon: Icons.local_drink_outlined, title: "Air");
+                            _addWater(
+                              500,
+                              icon: Icons.local_drink_outlined,
+                              title: "Air",
+                            );
                           },
                         ),
                         WaterOption(
@@ -356,7 +349,11 @@ class _WaterScreenState extends State<WaterScreen> {
                           selected: selectedQuickAdd == 2,
                           onTap: () {
                             setState(() => selectedQuickAdd = 2);
-                            _addWater(750, icon: Icons.blender_outlined, title: "Air");
+                            _addWater(
+                              750,
+                              icon: Icons.blender_outlined,
+                              title: "Air",
+                            );
                           },
                         ),
                       ],
