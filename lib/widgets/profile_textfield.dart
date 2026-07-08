@@ -16,54 +16,52 @@ class ProfileTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    final isSmall = width < 360;
+    final isMedium = width < 400;
+
+    final labelFontSize = isSmall ? 15.0 : (isMedium ? 16.0 : 18.0);
+    final verticalPadding = isSmall ? 14.0 : (isMedium ? 17.0 : 20.0);
+    final horizontalPadding = isSmall ? 14.0 : (isMedium ? 17.0 : 20.0);
+    final radius = isSmall ? 14.0 : 18.0;
 
     return Column(
-
       crossAxisAlignment: CrossAxisAlignment.start,
-
       children: [
-
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 18,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontSize: labelFontSize,
             fontWeight: FontWeight.w600,
           ),
         ),
 
-        const SizedBox(height:10),
+        SizedBox(height: isSmall ? 8 : 10),
 
         TextField(
-
           readOnly: readOnly,
-
           decoration: InputDecoration(
-
             hintText: hint,
-
             suffixIcon: suffix,
-
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal:20,
-              vertical:20,
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: horizontalPadding,
+              vertical: verticalPadding,
             ),
-
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(radius),
             ),
-
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(radius),
             ),
-
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(radius),
             ),
           ),
         ),
 
-        const SizedBox(height:24),
-
+        SizedBox(height: isSmall ? 18 : 24),
       ],
     );
   }
