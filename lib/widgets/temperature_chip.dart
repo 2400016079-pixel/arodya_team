@@ -16,30 +16,40 @@ class TemperatureChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isSmall = screenWidth < 360;
+
+    final horizontalPadding = isSmall ? 8.0 : 10.0;
+    final verticalPadding = isSmall ? 10.0 : 12.0;
+    final iconSize = isSmall ? 18.0 : 20.0;
+    final fontSize = isSmall ? 13.5 : 15.0;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+        padding: EdgeInsets.symmetric(
+          horizontal: horizontalPadding,
+          vertical: verticalPadding,
+        ),
         decoration: BoxDecoration(
           color: selected ? const Color(0xffE7F0EA) : const Color(0xffF4F4F4),
           borderRadius: BorderRadius.circular(30),
         ),
         child: Row(
-          // Centered + content shrunk to fit: previously this Row
-          // defaulted to mainAxisAlignment.start with unconstrained
-          // text, so icon+label together were wider than each
-          // Expanded's 1/3 share of the row.
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 20, color: const Color(0xff5A845F)),
-            const SizedBox(width: 6),
+            Icon(icon, size: iconSize, color: const Color(0xff5A845F)),
+            SizedBox(width: isSmall ? 4 : 6),
             Flexible(
               child: Text(
                 title,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: 15, color: Color(0xff4A4A4A)),
+                style: TextStyle(
+                  fontSize: fontSize,
+                  color: const Color(0xff4A4A4A),
+                ),
               ),
             ),
           ],
