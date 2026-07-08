@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import '../../models/mood_model.dart';
+import '../../services/mood_service.dart';
+
 import '../../widgets/bottom_navbar.dart';
 import '../../widgets/mood_card.dart';
 import '../../widgets/factor_chip.dart';
@@ -14,6 +19,21 @@ class MoodScreen extends StatefulWidget {
 class _MoodScreenState extends State<MoodScreen> {
   int selectedMood = 1;
   int selectedFactor = 1;
+
+  final List<String> moods = [
+  "Senang",
+  "Tenang",
+  "Biasa",
+  "Sedih",
+  ];
+
+final List<String> factors = [
+  "Work",
+  "Sleep",
+  "Exercise",
+  "Family",
+  "Health",
+  ];
 
   final noteController = TextEditingController();
 
@@ -361,13 +381,38 @@ class _MoodScreenState extends State<MoodScreen> {
                 width: double.infinity,
                 height: 65,
                 child: ElevatedButton(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Mood berhasil disimpan"),
-                      ),
-                    );
-                  },
+                  onPressed: () async {
+  final mood = MoodModel(
+    mood: moods[selectedMood],
+    factor: factors[selectedFactor],
+    note: noteController.text.trim(),
+    createdAt: Timestamp.now(),
+  );
+
+  final error = await MoodService().addMood(mood);
+
+  if (!mounted) return;
+
+  if (error == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Mood berhasil disimpan"),
+      ),
+    );
+
+    setState(() {
+      selectedMood = 1;
+      selectedFactor = 1;
+      noteController.clear();
+    });
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(error),
+      ),
+    );
+  }
+},
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xff5A845F),
                     shape: RoundedRectangleBorder(
