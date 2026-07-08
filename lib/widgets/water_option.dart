@@ -16,11 +16,20 @@ class WaterOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isSmall = screenWidth < 360;
+    final isMedium = screenWidth < 400;
+
+    final boxWidth = isSmall ? 84.0 : (isMedium ? 92.0 : 100.0);
+    final boxHeight = isSmall ? 112.0 : (isMedium ? 122.0 : 130.0);
+    final iconSize = isSmall ? 32.0 : (isMedium ? 35.0 : 38.0);
+    final amountFontSize = isSmall ? 17.0 : (isMedium ? 18.5 : 20.0);
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 100,
-        height: 130,
+        width: boxWidth,
+        height: boxHeight,
         decoration: BoxDecoration(
           color: selected
               ? const Color(0xffDDE9E1)
@@ -38,15 +47,19 @@ class WaterOption extends StatelessWidget {
           children: [
             Icon(
               icon,
-              size: 38,
+              size: iconSize,
               color: const Color(0xff6B756E),
             ),
-            const SizedBox(height: 12),
-            Text(
-              amount,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
+            SizedBox(height: isSmall ? 8 : 12),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                amount,
+                maxLines: 1,
+                style: TextStyle(
+                  fontSize: amountFontSize,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ],
