@@ -19,56 +19,48 @@ class ProfileStatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 165,
-      padding: const EdgeInsets.all(20),
-
+      // Fixed width: 165 removed. This card is used both inside an
+      // Expanded (2-up row) and standalone (full width) — a fixed
+      // width fought both cases and could overflow narrow screens.
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(26),
+        borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(.05),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
-
       child: Column(
         children: [
-
-          Icon(
-            icon,
-            color: iconColor,
-            size: 34,
-          ),
-
-          const SizedBox(height: 14),
-
+          Icon(icon, color: iconColor, size: 26),
+          const SizedBox(height: 10),
           Text(
             value,
-            style: const TextStyle(
-              fontSize: 34,
-              fontWeight: FontWeight.bold,
-            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
-
-          const SizedBox(height: 8),
-
+          const SizedBox(height: 4),
           Text(
             label,
             textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: const TextStyle(
-              fontSize: 15,
+              fontSize: 12,
               color: Colors.black54,
               fontWeight: FontWeight.w600,
             ),
           ),
-
           if (bottomWidget != null) ...[
-            const SizedBox(height: 18),
+            const SizedBox(height: 14),
             bottomWidget!,
-          ]
+          ],
         ],
       ),
     );

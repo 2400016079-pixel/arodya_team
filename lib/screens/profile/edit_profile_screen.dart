@@ -1,12 +1,119 @@
 import 'package:flutter/material.dart';
 
+import '../../models/user_model.dart';
+import '../../services/user_service.dart';
+import '../../services/auth_service.dart';
+
 import '../../widgets/profile_textfield.dart';
 
-class EditProfileScreen extends StatelessWidget {
+class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  State<EditProfileScreen> createState() =>
+      _EditProfileScreenState();
+}
+
+class _EditProfileScreenState
+    extends State<EditProfileScreen> {
+      final nameController = TextEditingController();
+final emailController = TextEditingController();
+final weightController = TextEditingController();
+final heightController = TextEditingController();
+
+final oldPasswordController = TextEditingController();
+final newPasswordController = TextEditingController();
+final confirmPasswordController = TextEditingController();
+final birthDateController = TextEditingController();
+
+String gender = "";
+String birthDate = "";
+
+UserModel? user;
+
+@override
+void initState() {
+  super.initState();
+  loadUser();
+}
+
+Future<void> loadUser() async {
+  final uid = AuthService().currentUser!.uid;
+
+  print("UID LOGIN = $uid");
+
+  final data = await UserService()
+      .getUser(uid)
+      .first;
+
+  user = data;
+
+  nameController.text = data.name;
+  emailController.text = data.email;
+  weightController.text = data.weight;
+  heightController.text = data.height;
+  birthDateController.text = data.birthDate;
+
+  setState(() {
+    gender = data.gender;
+  });
+}
+
+Future<void> saveProfile() async {
+  try {
+    print("Tombol Simpan ditekan");
+
+    final uid = AuthService().currentUser!.uid;
+    print("UID: $uid");
+
+    await UserService().updateUser(
+      UserModel(
+        uid: uid,
+        name: nameController.text.trim(),
+        email: emailController.text.trim(),
+        gender: gender,
+        birthDate: birthDateController.text.trim(),
+        weight: weightController.text.trim(),
+        height: heightController.text.trim(),
+        photoUrl: user?.photoUrl ?? "",
+      ),
+    );
+
+    print("Berhasil update Firestore");
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Profil berhasil diperbarui"),
+      ),
+    );
+
+    Navigator.pop(context);
+
+  } catch (e) {
+    print("ERROR: $e");
+  }
+}
+
+@override
+void dispose() {
+  nameController.dispose();
+  emailController.dispose();
+  weightController.dispose();
+  heightController.dispose();
+
+  birthDateController.dispose();
+
+  oldPasswordController.dispose();
+  newPasswordController.dispose();
+  confirmPasswordController.dispose();
+
+  super.dispose();
+}
+
+@override
+Widget build(BuildContext context) {
 
     return Scaffold(
 
@@ -128,29 +235,25 @@ class EditProfileScreen extends StatelessWidget {
                   ),
 
                   const SizedBox(height:30),
-
-                  const ProfileTextField(
-                    label: "Nama Lengkap",
-                    hint: "Aria Chen",
-                  ),
+ProfileTextField(
+  controller: nameController,
+  label: "Nama Lengkap",
+  hint: "Masukkan nama lengkap",
+),
 
                   Row(
 
                     children: [
 
-                      const Expanded(
-
-                        child: ProfileTextField(
-                          label: "Email",
-                          hint:
-                              "aria.chen@example.com",
-                          readOnly: true,
-                          suffix: Icon(
-                            Icons.lock_outline,
-                          ),
-                        ),
-                      ),
-
+                      Expanded(
+  child: ProfileTextField(
+    controller: emailController,
+    label: "Email",
+    hint: "Email",
+    readOnly: true,
+    suffix: const Icon(Icons.lock_outline),
+  ),
+),
                       const SizedBox(width:12),
 
                       SizedBox(
@@ -224,57 +327,75 @@ class EditProfileScreen extends StatelessWidget {
                   const SizedBox(height:30),
 
                   DropdownButtonFormField<String>(
-                    value: "Wanita",
+  value: gender.isEmpty ? null : gender,
 
-                    decoration: InputDecoration(
-                      labelText: "Jenis Kelamin",
-                      border: OutlineInputBorder(
-                        borderRadius:
-                            BorderRadius.circular(18),
-                      ),
-                    ),
+  decoration: InputDecoration(
+    labelText: "Jenis Kelamin",
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(18),
+    ),
+  ),
 
-                    items: const [
-                      DropdownMenuItem(
-                        value: "Pria",
-                        child: Text("Pria"),
-                      ),
-                      DropdownMenuItem(
-                        value: "Wanita",
-                        child: Text("Wanita"),
-                      ),
-                    ],
+  items: const [
+    DropdownMenuItem(
+      value: "Pria",
+      child: Text("Pria"),
+    ),
+    DropdownMenuItem(
+      value: "Wanita",
+      child: Text("Wanita"),
+    ),
+  ],
 
-                    onChanged: (value) {},
-                  ),
-
-                  const SizedBox(height:24),
-
-                  TextField(
-                    decoration: InputDecoration(
-                      labelText: "Tanggal Lahir",
-                      hintText: "05/14/1992",
-                      suffixIcon: const Icon(
-                        Icons.keyboard_arrow_down,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius:
-                            BorderRadius.circular(18),
-                      ),
-                    ),
-                  ),
+  onChanged: (value) {
+    setState(() {
+      gender = value!;
+    });
+  },
+),
 
                   const SizedBox(height:24),
 
-                  const ProfileTextField(
-                    label: "Berat Badan (kg)",
-                    hint: "62",
-                  ),
+                 TextField(
+  controller: birthDateController,
+  readOnly: true,
+  onTap: () async {
+    DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1950),
+      lastDate: DateTime.now(),
+    );
 
-                  const ProfileTextField(
-                    label: "Tinggi Badan (cm)",
-                    hint: "168",
-                  ),
+    if (picked != null) {
+      birthDateController.text =
+          "${picked.day}/${picked.month}/${picked.year}";
+    }
+  },
+  decoration: InputDecoration(
+    labelText: "Tanggal Lahir",
+    suffixIcon: const Icon(
+      Icons.calendar_month,
+    ),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(18),
+    ),
+  ),
+),
+
+                  const SizedBox(height:24),
+
+                  ProfileTextField(
+  controller: weightController,
+  label: "Berat Badan (kg)",
+  hint: "0",
+),
+
+                 ProfileTextField(
+  controller: heightController,
+  label: "Tinggi Badan (cm)",
+  hint: "0",
+),
 
                 ],
               ),
@@ -314,20 +435,23 @@ class EditProfileScreen extends StatelessWidget {
 
                   const SizedBox(height: 30),
 
-                  const ProfileTextField(
-                    label: "Kata Sandi Lama",
-                    hint: "••••••••",
-                  ),
+                  ProfileTextField(
+  controller: oldPasswordController,
+  label: "Kata Sandi Lama",
+  hint: "••••••••",
+),
 
-                  const ProfileTextField(
-                    label: "Kata Sandi Baru",
-                    hint: "••••••••",
-                  ),
+                  ProfileTextField(
+  controller: newPasswordController,
+  label: "Kata Sandi Baru",
+  hint: "••••••••",
+),
 
-                  const ProfileTextField(
-                    label: "Konfirmasi Kata Sandi Baru",
-                    hint: "••••••••",
-                  ),
+                  ProfileTextField(
+  controller: confirmPasswordController,
+  label: "Konfirmasi Kata Sandi Baru",
+  hint: "••••••••",
+),
 
                 ],
               ),
@@ -341,7 +465,7 @@ class EditProfileScreen extends StatelessWidget {
 
               child: ElevatedButton(
 
-                onPressed: () {},
+                onPressed: saveProfile,
 
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xff35694A),

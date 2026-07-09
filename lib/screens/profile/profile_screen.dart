@@ -1,5 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../../services/auth_service.dart';
+import '../auth/login_screen.dart';
+
+import '../../models/user_model.dart';
+import '../../services/user_service.dart';
+
+import 'edit_profile_screen.dart';
+
+import '../mood/mood_screen.dart';
 import '../../widgets/bottom_navbar.dart';
 import '../../widgets/profile_setting_tile.dart';
 import '../../widgets/profile_stat_card.dart';
@@ -13,13 +22,28 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Simple responsive helper: clamp avatar/font sizes based on
+    // screen width instead of using fixed values tuned for one
+    // device. Most phones fall in the 340-430 range; tablets get
+    // capped so things don't blow up too.
+    final width = MediaQuery.of(context).size.width;
+
+    final uid = AuthService().currentUser!.uid;
+    print("LOGIN UID = $uid");
+
+    final avatarRadius = (width * 0.18).clamp(56.0, 76.0);
+
     return Scaffold(
       backgroundColor: const Color(0xffF8FAF9),
 
-      // PERBAIKAN: Memindahkan bottomNavigationBar ke level Scaffold (di luar body)
       bottomNavigationBar: BottomNavbar(
         currentIndex: 0,
         onTap: (index) {
+          // Fixed mapping: BottomNavbar has 5 destinations
+          // (Home, Activity, Water, Mood, Stats) but this switch
+          // previously only handled 4 cases, so index 3 ("Mood")
+          // incorrectly opened Statistics and index 4 ("Stats") did
+          // nothing at all.
           switch (index) {
             case 0:
               Navigator.pushReplacement(
@@ -43,6 +67,15 @@ class ProfileScreen extends StatelessWidget {
               break;
 
             case 3:
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+      builder: (_) => const MoodScreen(),
+    ),
+  );
+  break;
+
+            case 4:
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (_) => const StatisticsScreen()),
@@ -54,7 +87,7 @@ class ProfileScreen extends StatelessWidget {
 
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(20),
           child: Column(
             children: [
               //================ HEADER =================
@@ -64,51 +97,111 @@ class ProfileScreen extends StatelessWidget {
                   const Text(
                     "ZenFit",
                     style: TextStyle(
-                      fontSize: 30,
+                      fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Color(0xff35694A),
                     ),
                   ),
-                  const Icon(Icons.person_outline, size: 32),
+                  const Icon(Icons.person_outline, size: 26),
                 ],
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 28),
 
               //================ PROFILE =================
               Stack(
                 children: [
                   CircleAvatar(
-                    radius: 85,
+                    radius: avatarRadius + 5,
                     backgroundColor: const Color(0xffE5EFE8),
-                    child: const CircleAvatar(
-                      radius: 80,
-                      backgroundImage: AssetImage("assets/images/profile.jpg"),
+                    child: CircleAvatar(
+                      radius: avatarRadius,
+                      backgroundImage:
+                          const AssetImage("assets/images/profile.jpg"),
                     ),
                   ),
-                  const Positioned(
+                  Positioned(
                     right: 0,
-                    bottom: 8,
+                    bottom: 4,
                     child: CircleAvatar(
-                      radius: 22,
-                      backgroundColor: Color(0xff4F7F5D),
-                      child: Icon(Icons.edit, color: Colors.white),
+                      radius: 18,
+                      backgroundColor: const Color(0xff4F7F5D),
+                      child: const Icon(
+                        Icons.edit,
+                        color: Colors.white,
+                        size: 18,
+                      ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
-              const Text(
-                "rosiana",
-                style: TextStyle(fontSize: 42, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 12),
-              const Text(
-                "Find balance in motion, harmony in stillness.",
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.black54, fontSize: 20),
-              ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 18),
 
+StreamBuilder<UserModel>(
+  stream: UserService().getUser(uid),
+  builder: (context, snapshot) {
+
+    if (snapshot.hasError) {
+      return Center(
+        child: Text(
+          snapshot.error.toString(),
+          style: const TextStyle(color: Colors.red),
+        ),
+      );
+    }
+
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    if (!snapshot.hasData) {
+      return const Center(
+        child: Text("Data user tidak ditemukan"),
+      );
+    }
+
+    final user = snapshot.data!;
+
+    return Column(
+      children: [
+        Text(
+          user.name,
+          style: const TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+
+        const SizedBox(height: 8),
+
+        Text(
+          user.email,
+          style: const TextStyle(
+            fontSize: 15,
+            color: Colors.grey,
+          ),
+        ),
+
+        const SizedBox(height: 8),
+
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 12),
+          child: Text(
+            "Find balance in motion, harmony in stillness.",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.black54,
+              fontSize: 15,
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 28),
+      ],
+    );
+  },
+),
               //================ STATS =================
               Row(
                 children: [
@@ -120,7 +213,7 @@ class ProfileScreen extends StatelessWidget {
                       label: "DAY STREAK",
                     ),
                   ),
-                  const SizedBox(width: 18),
+                  const SizedBox(width: 14),
                   Expanded(
                     child: ProfileStatCard(
                       icon: Icons.water_drop,
@@ -131,7 +224,7 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 22),
+              const SizedBox(height: 16),
               ProfileStatCard(
                 icon: Icons.show_chart,
                 iconColor: const Color(0xff35694A),
@@ -141,11 +234,11 @@ class ProfileScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(30),
                   child: const LinearProgressIndicator(
                     value: .78,
-                    minHeight: 8,
+                    minHeight: 6,
                   ),
                 ),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 30),
 
               //================ ACCOUNT SETTINGS =================
               Align(
@@ -153,38 +246,45 @@ class ProfileScreen extends StatelessWidget {
                 child: Text(
                   "PENGATURAN AKUN",
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: Colors.grey.shade700,
-                    letterSpacing: 1,
+                    letterSpacing: 0.8,
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 14),
               Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 18,
-                  vertical: 10,
+                  horizontal: 14,
+                  vertical: 6,
                 ),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(28),
+                  borderRadius: BorderRadius.circular(22),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(.05),
-                      blurRadius: 18,
-                      offset: const Offset(0, 8),
+                      blurRadius: 14,
+                      offset: const Offset(0, 6),
                     ),
                   ],
                 ),
                 child: Column(
                   children: [
                     ProfileSettingTile(
-                      icon: Icons.person_add_alt_1,
-                      title: "Edit Profil",
-                      subtitle: "Nama, foto, dan data fisik",
-                      onTap: () {},
-                    ),
+  icon: Icons.person_add_alt_1,
+  title: "Edit Profil",
+  subtitle: "Nama, foto, dan data fisik",
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const EditProfileScreen(),
+      ),
+    );
+  },
+),
                     const Divider(),
                     ProfileSettingTile(
                       icon: Icons.lock_outline,
@@ -195,7 +295,7 @@ class ProfileScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 35),
+              const SizedBox(height: 26),
 
               //================ APP SETTINGS =================
               Align(
@@ -203,27 +303,27 @@ class ProfileScreen extends StatelessWidget {
                 child: Text(
                   "PENGATURAN APLIKASI",
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: Colors.grey.shade700,
-                    letterSpacing: 1,
+                    letterSpacing: 0.8,
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 14),
               Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 18,
-                  vertical: 10,
+                  horizontal: 14,
+                  vertical: 6,
                 ),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(28),
+                  borderRadius: BorderRadius.circular(22),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(.05),
-                      blurRadius: 18,
-                      offset: const Offset(0, 8),
+                      blurRadius: 14,
+                      offset: const Offset(0, 6),
                     ),
                   ],
                 ),
@@ -245,70 +345,34 @@ class ProfileScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 35),
-
-              //================ CONNECTIVITY =================
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "KONEKTIVITAS",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey.shade700,
-                    letterSpacing: 1,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 18,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(28),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(.05),
-                      blurRadius: 18,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    ProfileSettingTile(
-                      icon: Icons.verified_user_outlined,
-                      title: "Privasi & Izin Data",
-                      subtitle: "Data sharing & permissions",
-                      onTap: () {},
-                    ),
-                    const Divider(),
-                    ProfileSettingTile(
-                      icon: Icons.devices_other_outlined,
-                      title: "Perangkat Terhubung",
-                      subtitle: "Google Fit / Apple Health",
-                      onTap: () {},
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 60),
+              const SizedBox(height: 40),
+              // Konektivitas section (Privasi & Izin Data, Perangkat
+              // Terhubung) removed per request.
 
               //================ LOG OUT =================
               SizedBox(
-                width: 220,
-                height: 60,
+                width: 200,
+                height: 52,
                 child: ElevatedButton.icon(
-                  onPressed: () {},
-                  icon: const Icon(Icons.logout, color: Colors.red),
+                  onPressed: () async {
+  await AuthService().logout();
+
+  if (!context.mounted) return;
+
+  Navigator.pushAndRemoveUntil(
+    context,
+    MaterialPageRoute(
+      builder: (_) => const LoginScreen(),
+    ),
+    (route) => false,
+  );
+},
+                  icon: const Icon(Icons.logout, color: Colors.red, size: 20),
                   label: const Text(
                     "Log Out",
                     style: TextStyle(
                       color: Colors.red,
-                      fontSize: 24,
+                      fontSize: 18,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -316,12 +380,12 @@ class ProfileScreen extends StatelessWidget {
                     backgroundColor: const Color(0xffFFDADA),
                     elevation: 0,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(35),
+                      borderRadius: BorderRadius.circular(30),
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 40), // Jarak aman di bawah tombol Log Out
+              const SizedBox(height: 30),
             ],
           ),
         ),

@@ -1,6 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import '../models/user_model.dart';
+import '../services/user_service.dart';
+
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -19,6 +22,19 @@ class AuthService {
 
       await userCredential.user?.updateDisplayName(name.trim());
       await userCredential.user?.reload();
+
+      await UserService().createUser(
+        UserModel(
+    uid: userCredential.user!.uid,
+    name: name.trim(),
+    email: email.trim(),
+    gender: "",
+    birthDate: "",
+    weight: "",
+    height: "",
+    photoUrl: "",
+  ),
+);
 
       return null;
     } on FirebaseAuthException catch (e) {
@@ -77,7 +93,7 @@ class AuthService {
     }
   }
 
-  // ================= LOGIN GOOGLE =================
+ // ================= LOGIN GOOGLE =================
 Future<String?> signInWithGoogle() async {
   try {
     final GoogleSignIn googleSignIn = GoogleSignIn();
@@ -99,7 +115,25 @@ Future<String?> signInWithGoogle() async {
       idToken: googleAuth.idToken,
     );
 
-    await _auth.signInWithCredential(credential);
+    UserCredential userCredential =
+        await _auth.signInWithCredential(credential);
+
+    final user = userCredential.user!;
+
+    if (!await UserService().userExists(user.uid)) {
+      await UserService().createUser(
+        UserModel(
+          uid: user.uid,
+          name: user.displayName ?? "",
+          email: user.email ?? "",
+          gender: "",
+          birthDate: "",
+          weight: "",
+          height: "",
+          photoUrl: user.photoURL ?? "",
+        ),
+      );
+    }
 
     return null;
   } on FirebaseAuthException catch (e) {
@@ -108,7 +142,6 @@ Future<String?> signInWithGoogle() async {
     return e.toString();
   }
 }
-
   // ================= RESET PASSWORD =================
   Future<String?> resetPassword({
     required String email,

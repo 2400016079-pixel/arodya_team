@@ -16,42 +16,33 @@ class ProfileSettingTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return ListTile(
+      contentPadding: const EdgeInsets.symmetric(vertical: 2),
 
-      contentPadding:
-          const EdgeInsets.symmetric(vertical: 8),
-
+      // Radius 28 (56px) + bold 22px title + 17px subtitle was too
+      // wide for the space left after the leading icon and trailing
+      // chevron on narrow screens, forcing titles onto 2 lines.
       leading: CircleAvatar(
-        radius: 28,
+        radius: 22,
         backgroundColor: const Color(0xffF3F3F3),
-
-        child: Icon(
-          icon,
-          color: Colors.black54,
-        ),
+        child: Icon(icon, color: Colors.black54, size: 20),
       ),
 
       title: Text(
         title,
-        style: const TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 22,
-        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
       ),
 
       subtitle: Text(
         subtitle,
-        style: const TextStyle(
-          color: Colors.black54,
-          fontSize: 17,
-        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: const TextStyle(color: Colors.black54, fontSize: 13),
       ),
 
-      trailing: const Icon(
-        Icons.chevron_right,
-        size: 30,
-      ),
+      trailing: const Icon(Icons.chevron_right, size: 24),
 
       onTap: onTap,
     );

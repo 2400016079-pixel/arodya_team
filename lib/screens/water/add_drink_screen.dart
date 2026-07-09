@@ -21,8 +21,6 @@ class _AddDrinkScreenState extends State<AddDrinkScreen> {
 
   @override
   void dispose() {
-    // Was missing before: without this the controller leaks every time
-    // this screen is opened and closed.
     amountController.dispose();
     super.dispose();
   }
@@ -32,9 +30,7 @@ class _AddDrinkScreenState extends State<AddDrinkScreen> {
 
     if (amount == null || amount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please enter a valid amount"),
-        ),
+        const SnackBar(content: Text("Please enter a valid amount")),
       );
       return;
     }
@@ -48,21 +44,16 @@ class _AddDrinkScreenState extends State<AddDrinkScreen> {
       "temperature": temperatures[selectedTemperature],
     };
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Drink Saved Successfully"),
-      ),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text("Drink Saved Successfully")));
 
-    // Return the entered data to whoever pushed this screen instead of
-    // just popping with nothing.
     Navigator.pop(context, result);
   }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      // Tap anywhere outside the text field to dismiss the keyboard.
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         backgroundColor: Colors.white,
@@ -84,7 +75,7 @@ class _AddDrinkScreenState extends State<AddDrinkScreen> {
                         "Add Drink",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: 28,
+                          fontSize: 22,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -96,26 +87,24 @@ class _AddDrinkScreenState extends State<AddDrinkScreen> {
                   ],
                 ),
 
-                const SizedBox(height: 45),
+                const SizedBox(height: 28),
 
                 const Text(
                   "Amount (ml)",
-                  style: TextStyle(
-                    fontSize: 26,
-                    color: Colors.black54,
-                  ),
+                  style: TextStyle(fontSize: 18, color: Colors.black54),
                 ),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: 14),
 
                 Container(
+                  width: double.infinity,
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 25,
-                    vertical: 20,
+                    horizontal: 20,
+                    vertical: 14,
                   ),
                   decoration: BoxDecoration(
                     color: const Color(0xffF4F4F4),
-                    borderRadius: BorderRadius.circular(22),
+                    borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
                     children: [
@@ -124,13 +113,11 @@ class _AddDrinkScreenState extends State<AddDrinkScreen> {
                           controller: amountController,
                           keyboardType: TextInputType.number,
                           inputFormatters: [
-                            // Prevents non-numeric input instead of only
-                            // relying on the number keyboard.
                             FilteringTextInputFormatter.digitsOnly,
                           ],
                           textAlign: TextAlign.center,
                           style: const TextStyle(
-                            fontSize: 52,
+                            fontSize: 38,
                             fontWeight: FontWeight.bold,
                             color: Color(0xff6C7487),
                           ),
@@ -142,32 +129,28 @@ class _AddDrinkScreenState extends State<AddDrinkScreen> {
                       ),
                       const Text(
                         "ml",
-                        style: TextStyle(
-                          fontSize: 30,
-                          color: Colors.black54,
-                        ),
+                        style: TextStyle(fontSize: 20, color: Colors.black54),
                       ),
                     ],
                   ),
                 ),
 
-                const SizedBox(height: 40),
+                const SizedBox(height: 30),
 
                 //================ FAVORITE CONTAINERS =================
                 const Text(
                   "FAVORITE CONTAINERS",
                   style: TextStyle(
-                    fontSize: 18,
-                    letterSpacing: 2,
+                    fontSize: 13,
+                    letterSpacing: 1.2,
                     color: Colors.black54,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: 14),
 
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
                       child: ContainerCard(
@@ -183,7 +166,7 @@ class _AddDrinkScreenState extends State<AddDrinkScreen> {
                         },
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: 14),
                     Expanded(
                       child: ContainerCard(
                         icon: Icons.local_cafe,
@@ -201,24 +184,32 @@ class _AddDrinkScreenState extends State<AddDrinkScreen> {
                   ],
                 ),
 
-                const SizedBox(height: 40),
+                const SizedBox(height: 30),
 
                 //================ DRINK TYPE =================
                 const Text(
                   "DRINK TYPE",
                   style: TextStyle(
-                    fontSize: 18,
-                    letterSpacing: 2,
+                    fontSize: 13,
+                    letterSpacing: 1.2,
                     color: Colors.black54,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: 14),
 
-                Wrap(
-                  spacing: 16,
-                  runSpacing: 16,
+                // Replaced Wrap with a 3-column GridView so all 6
+                // drink types line up evenly in 2 clean rows instead
+                // of wrapping 2-per-row with "Isotonic" left dangling
+                // alone on its own line.
+                GridView.count(
+                  crossAxisCount: 3,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: 0.95,
                   children: [
                     DrinkTypeCard(
                       icon: Icons.water_drop,
@@ -259,93 +250,99 @@ class _AddDrinkScreenState extends State<AddDrinkScreen> {
                   ],
                 ),
 
-                const SizedBox(height: 40),
+                const SizedBox(height: 30),
 
                 //================ TEMPERATURE =================
                 const Text(
                   "Temperature",
                   style: TextStyle(
-                    fontSize: 22,
+                    fontSize: 17,
                     color: Colors.black54,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: 14),
 
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    TemperatureChip(
-                      icon: Icons.ac_unit,
-                      title: "Cold",
-                      selected: selectedTemperature == 0,
-                      onTap: () => setState(() => selectedTemperature = 0),
+                    Expanded(
+                      child: TemperatureChip(
+                        icon: Icons.ac_unit,
+                        title: "Cold",
+                        selected: selectedTemperature == 0,
+                        onTap: () => setState(() => selectedTemperature = 0),
+                      ),
                     ),
-                    TemperatureChip(
-                      icon: Icons.water,
-                      title: "Normal",
-                      selected: selectedTemperature == 1,
-                      onTap: () => setState(() => selectedTemperature = 1),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: TemperatureChip(
+                        icon: Icons.water,
+                        title: "Normal",
+                        selected: selectedTemperature == 1,
+                        onTap: () => setState(() => selectedTemperature = 1),
+                      ),
                     ),
-                    TemperatureChip(
-                      icon: Icons.local_fire_department,
-                      title: "Hot",
-                      selected: selectedTemperature == 2,
-                      onTap: () => setState(() => selectedTemperature = 2),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: TemperatureChip(
+                        icon: Icons.local_fire_department,
+                        title: "Hot",
+                        selected: selectedTemperature == 2,
+                        onTap: () => setState(() => selectedTemperature = 2),
+                      ),
                     ),
                   ],
                 ),
 
-                const SizedBox(height: 35),
+                const SizedBox(height: 28),
 
                 //================ TIME =================
                 Container(
+                  width: double.infinity,
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 22,
-                    vertical: 18,
+                    horizontal: 18,
+                    vertical: 14,
                   ),
                   decoration: BoxDecoration(
                     color: const Color(0xffF4F4F4),
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(18),
                   ),
                   child: Row(
                     children: [
                       const Icon(
                         Icons.access_time,
-                        size: 34,
+                        size: 26,
                         color: Colors.black54,
                       ),
-                      const SizedBox(width: 18),
+                      const SizedBox(width: 14),
                       const Expanded(
-                        child: Text(
-                          "Time",
-                          style: TextStyle(fontSize: 22),
-                        ),
+                        child: Text("Time", style: TextStyle(fontSize: 17)),
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 22,
-                          vertical: 12,
+                          horizontal: 16,
+                          vertical: 9,
                         ),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(14),
                         ),
                         child: const Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
                               "Now",
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 15,
                                 color: Color(0xff5A845F),
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            SizedBox(width: 8),
+                            SizedBox(width: 6),
                             Icon(
                               Icons.edit,
-                              size: 18,
+                              size: 15,
                               color: Color(0xff5A845F),
                             ),
                           ],
@@ -355,46 +352,40 @@ class _AddDrinkScreenState extends State<AddDrinkScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 45),
+                const SizedBox(height: 36),
 
                 //================ SAVE BUTTON =================
                 SizedBox(
                   width: double.infinity,
-                  height: 65,
+                  height: 56,
                   child: ElevatedButton(
                     onPressed: _saveEntry,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xff5A845F),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(35),
+                        borderRadius: BorderRadius.circular(32),
                       ),
                     ),
                     child: const Text(
                       "Save Entry",
-                      style: TextStyle(
-                        fontSize: 24,
-                        color: Colors.white,
-                      ),
+                      style: TextStyle(fontSize: 19, color: Colors.white),
                     ),
                   ),
                 ),
 
-                const SizedBox(height: 28),
+                const SizedBox(height: 20),
 
                 Center(
                   child: TextButton(
                     onPressed: () => Navigator.pop(context),
                     child: const Text(
                       "Cancel",
-                      style: TextStyle(
-                        fontSize: 24,
-                        color: Colors.black54,
-                      ),
+                      style: TextStyle(fontSize: 18, color: Colors.black54),
                     ),
                   ),
                 ),
 
-                const SizedBox(height: 30),
+                const SizedBox(height: 24),
               ],
             ),
           ),
