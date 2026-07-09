@@ -20,82 +20,93 @@ class StatsSummaryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+
+    // Breakpoint sederhana
+    final isSmall = width < 360;
+    final isMedium = width < 400;
+
+    final avatarRadius = isSmall ? 24.0 : (isMedium ? 28.0 : 32.0);
+    final iconSize = isSmall ? 24.0 : (isMedium ? 28.0 : 34.0);
+    final titleFontSize = isSmall ? 14.0 : (isMedium ? 16.0 : 18.0);
+    final valueFontSize = isSmall ? 18.0 : (isMedium ? 20.0 : 24.0);
+    final unitFontSize = isSmall ? 14.0 : (isMedium ? 16.0 : 18.0);
+    final trailingIconSize = isSmall ? 28.0 : (isMedium ? 32.0 : 38.0);
+    final tilePadding = isSmall ? 12.0 : (isMedium ? 15.0 : 18.0);
+
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: EdgeInsets.all(tilePadding),
 
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(26),
-
+        borderRadius: BorderRadius.circular(isSmall ? 18 : 26),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(.05),
-            blurRadius: 15,
-          ),
+          BoxShadow(color: Colors.black.withOpacity(.05), blurRadius: 15),
         ],
       ),
 
       child: Row(
         children: [
-
           CircleAvatar(
-            radius: 32,
+            radius: avatarRadius,
             backgroundColor: iconBg,
-
-            child: Icon(
-              icon,
-              color: iconColor,
-              size: 34,
-            ),
+            child: Icon(icon, color: iconColor, size: iconSize),
           ),
 
-          const SizedBox(width: 18),
+          SizedBox(width: isSmall ? 10 : 18),
 
+          // Expanded supaya teks bisa menyusut/menyesuaikan ruang tersisa
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
                 Text(
                   title,
-                  style: const TextStyle(
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  style: TextStyle(
                     color: Colors.black54,
-                    fontSize: 18,
+                    fontSize: titleFontSize,
                   ),
                 ),
 
                 const SizedBox(height: 4),
 
-                RichText(
-                  text: TextSpan(
-                    children: [
-
-                      TextSpan(
-                        text: value,
-                        style: const TextStyle(
-                          fontSize: 24,
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
+                // FittedBox mencegah overflow jika angka/unit terlalu panjang
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: value,
+                          style: TextStyle(
+                            fontSize: valueFontSize,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-
-                      TextSpan(
-                        text: " $unit",
-                        style: const TextStyle(
-                          color: Colors.grey,
-                          fontSize: 18,
+                        TextSpan(
+                          text: " $unit",
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: unitFontSize,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ],
             ),
           ),
 
-          const Icon(
+          SizedBox(width: isSmall ? 6 : 10),
+
+          Icon(
             Icons.show_chart,
-            size: 38,
+            size: trailingIconSize,
             color: Colors.blueGrey,
           ),
         ],

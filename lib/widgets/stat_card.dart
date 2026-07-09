@@ -10,14 +10,19 @@ class StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+
+    // Skala padding & radius berdasarkan lebar layar
+    final horizontalPadding = width < 360 ? 16.0 : (width < 400 ? 20.0 : 24.0);
+    final radius = width < 360 ? 22.0 : 30.0;
+
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(horizontalPadding),
 
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
-
+        borderRadius: BorderRadius.circular(radius),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(.05),

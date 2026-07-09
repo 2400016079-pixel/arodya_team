@@ -16,33 +16,41 @@ class ProfileSettingTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    final isSmall = width < 360;
+
+    final avatarRadius = isSmall ? 19.0 : 22.0;
+    final leadingIconSize = isSmall ? 18.0 : 20.0;
+    final titleFontSize = isSmall ? 14.5 : 16.0;
+    final subtitleFontSize = isSmall ? 12.0 : 13.0;
+    final trailingIconSize = isSmall ? 20.0 : 24.0;
+
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(vertical: 2),
 
-      // Radius 28 (56px) + bold 22px title + 17px subtitle was too
-      // wide for the space left after the leading icon and trailing
-      // chevron on narrow screens, forcing titles onto 2 lines.
+      // Radius & font dikecilkan sedikit di layar sempit supaya
+      // title tetap muat 1 baris walau leading + trailing tetap ada.
       leading: CircleAvatar(
-        radius: 22,
+        radius: avatarRadius,
         backgroundColor: const Color(0xffF3F3F3),
-        child: Icon(icon, color: Colors.black54, size: 20),
+        child: Icon(icon, color: Colors.black54, size: leadingIconSize),
       ),
 
       title: Text(
         title,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        style: TextStyle(fontWeight: FontWeight.bold, fontSize: titleFontSize),
       ),
 
       subtitle: Text(
         subtitle,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: const TextStyle(color: Colors.black54, fontSize: 13),
+        style: TextStyle(color: Colors.black54, fontSize: subtitleFontSize),
       ),
 
-      trailing: const Icon(Icons.chevron_right, size: 24),
+      trailing: Icon(Icons.chevron_right, size: trailingIconSize),
 
       onTap: onTap,
     );
