@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:intl/intl.dart';
+
 import '../../widgets/bottom_navbar.dart';
 import '../../widgets/water_option.dart';
 import '../../widgets/water_history_tile.dart';
@@ -7,6 +9,9 @@ import 'add_drink_screen.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../activity/activity_screen.dart';
 import '../mood/mood_screen.dart';
+import '../../services/auth_service.dart';
+import '../../models/water_model.dart';
+import '../../services/water_service.dart';
 import '../statistics/statistics_screen.dart';
 
 class WaterScreen extends StatefulWidget {
@@ -31,6 +36,8 @@ class _HistoryEntry {
 }
 
 class _WaterScreenState extends State<WaterScreen> {
+  final WaterService _waterService = WaterService();
+final String uid = AuthService().currentUser!.uid;
   int selectedQuickAdd = -1;
 
   final int targetMl = 2000;
@@ -206,94 +213,119 @@ class _WaterScreenState extends State<WaterScreen> {
               const SizedBox(height: 30),
 
               //================ PROGRESS =================
-              Container(
-                width: ringSize,
-                height: ringSize,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: const Color(0xff5A84AC), width: 14),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.water_drop,
-                      size: 32,
-                      color: Color(0xff35694A),
-                    ),
-                    const SizedBox(height: 10),
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: "$consumedMl",
-                              style: const TextStyle(
-                                fontSize: 46,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xff7A9ABB),
-                              ),
-                            ),
-                            const TextSpan(
-                              text: " ml",
-                              style: TextStyle(
-                                fontSize: 22,
-                                color: Color(0xff7A9ABB),
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      "/ $targetMl ml",
-                      style: const TextStyle(
-                        fontSize: 17,
-                        color: Colors.black54,
-                      ),
-                    ),
-                  ],
-                ),
+StreamBuilder<int>(
+  stream: _waterService.getTodayWater(uid),
+  builder: (context, snapshot) {
+    final consumedMl = snapshot.data ?? 0;
+
+    final percent =
+        targetMl == 0
+            ? 0
+            : ((consumedMl / targetMl) * 100)
+                .clamp(0, 100)
+                .round();
+
+    return Column(
+      children: [
+        Container(
+          width: ringSize,
+          height: ringSize,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: const Color(0xff5A84AC),
+              width: 14,
+            ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.water_drop,
+                size: 32,
+                color: Color(0xff35694A),
               ),
 
-              const SizedBox(height: 26),
+              const SizedBox(height: 10),
 
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xffEDF5EF),
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.trending_up,
-                      color: Color(0xff5A845F),
-                      size: 20,
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        "Kamu mencapai $percent% dari target hari ini",
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: "$consumedMl",
                         style: const TextStyle(
-                          color: Color(0xff6C9275),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
+                          fontSize: 46,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xff7A9ABB),
                         ),
                       ),
-                    ),
-                  ],
+                      const TextSpan(
+                        text: " ml",
+                        style: TextStyle(
+                          fontSize: 22,
+                          color: Color(0xff7A9ABB),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
 
-              const SizedBox(height: 28),
+              const SizedBox(height: 6),
+
+              Text(
+                "/ $targetMl ml",
+                style: const TextStyle(
+                  fontSize: 17,
+                  color: Colors.black54,
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 26),
+
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 12,
+          ),
+          decoration: BoxDecoration(
+            color: const Color(0xffEDF5EF),
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Row(
+            children: [
+              const Icon(
+                Icons.trending_up,
+                color: Color(0xff5A845F),
+                size: 20,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  "Kamu mencapai $percent% dari target hari ini",
+                  style: const TextStyle(
+                    color: Color(0xff6C9275),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 28),
+      ],
+    );
+  },
+),
 
               //================ QUICK ADD =================
               Container(
@@ -328,14 +360,19 @@ class _WaterScreenState extends State<WaterScreen> {
                             icon: Icons.local_cafe_outlined,
                             amount: "250 ml",
                             selected: selectedQuickAdd == 0,
-                            onTap: () {
-                              setState(() => selectedQuickAdd = 0);
-                              _addWater(
-                                250,
-                                icon: Icons.local_cafe_outlined,
-                                title: "Air",
-                              );
-                            },
+                            onTap: () async {
+  setState(() => selectedQuickAdd = 0);
+
+  await _waterService.addWater(
+    WaterModel(
+  id: DateTime.now().millisecondsSinceEpoch.toString(),
+  uid: uid,
+  amount: 250,
+  drinkType: "Water",
+  date: DateTime.now(),
+)
+  );
+},
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -344,14 +381,19 @@ class _WaterScreenState extends State<WaterScreen> {
                             icon: Icons.local_drink_outlined,
                             amount: "500 ml",
                             selected: selectedQuickAdd == 1,
-                            onTap: () {
-                              setState(() => selectedQuickAdd = 1);
-                              _addWater(
-                                500,
-                                icon: Icons.local_drink_outlined,
-                                title: "Air",
-                              );
-                            },
+                            onTap: () async {
+  setState(() => selectedQuickAdd = 1);
+
+  await _waterService.addWater(
+    WaterModel(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      uid: uid,
+      drinkType: "Water",
+      amount: 500,
+      date: DateTime.now(),
+    ),
+  );
+},
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -360,14 +402,19 @@ class _WaterScreenState extends State<WaterScreen> {
                             icon: Icons.blender_outlined,
                             amount: "750 ml",
                             selected: selectedQuickAdd == 2,
-                            onTap: () {
-                              setState(() => selectedQuickAdd = 2);
-                              _addWater(
-                                750,
-                                icon: Icons.blender_outlined,
-                                title: "Air",
-                              );
-                            },
+                            onTap: () async {
+  setState(() => selectedQuickAdd = 2);
+
+  await _waterService.addWater(
+    WaterModel(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      uid: uid,
+      drinkType: "Water",
+      amount: 750,
+      date: DateTime.now(),
+    ),
+  );
+},
                           ),
                         ),
                       ],
@@ -425,15 +472,44 @@ class _WaterScreenState extends State<WaterScreen> {
                       ],
                     ),
                     const SizedBox(height: 10),
-                    for (int i = 0; i < history.length; i++) ...[
-                      WaterHistoryTile(
-                        icon: history[i].icon,
-                        title: history[i].title,
-                        time: history[i].time,
-                        amount: "+${history[i].amount} ml",
-                      ),
-                      if (i != history.length - 1) const Divider(),
-                    ],
+
+StreamBuilder<List<WaterModel>>(
+  stream: _waterService.getWaterHistory(uid),
+  builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    if (!snapshot.hasData || snapshot.data!.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 20),
+        child: Center(
+          child: Text("Belum ada riwayat minum"),
+        ),
+      );
+    }
+
+    final history = snapshot.data!;
+
+    return Column(
+      children: history.map((water) {
+        return Column(
+          children: [
+            WaterHistoryTile(
+  icon: Icons.water_drop,
+  title: water.drinkType,
+  time: DateFormat("HH:mm").format(water.date),
+  amount: "+${water.amount} ml",
+),
+            const Divider(),
+          ],
+        );
+      }).toList(),
+    );
+  },
+),
                   ],
                 ),
               ),

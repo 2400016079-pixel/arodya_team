@@ -22,6 +22,7 @@ import '../settings/notification_screen.dart';
 import '../statistics/statistics_screen.dart';
 import '../water/add_drink_screen.dart';
 import '../water/water_screen.dart';
+import '../../services/water_service.dart';
 import '../mood/mood_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
@@ -262,45 +263,70 @@ class DashboardScreen extends StatelessWidget {
               const SizedBox(height: 26),
 
               //================ WATER REMINDER ================
-              DashboardCard(
-                icon: Icons.water_drop,
-                iconBackground: const Color(0xffB8D8F5),
-                iconColor: const Color(0xff2266A8),
-                title: "Water Reminder",
-                value: "1.2 L",
-                subtitle: "Target 2.5 Liter",
-                backgroundColor: const Color(0xffDCE8F2),
-                borderColor: const Color(0xffBFD3E3),
-                bottomWidget: Column(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(30),
-                      child: const LinearProgressIndicator(
-                        value: .48,
-                        minHeight: 8,
-                        backgroundColor: Colors.white,
-                        valueColor: AlwaysStoppedAnimation(Color(0xff2C6C72)),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "0 L",
-                          style: TextStyle(color: Colors.black54, fontSize: 13),
-                        ),
-                        Text(
-                          "2.5 L",
-                          style: TextStyle(color: Colors.black54, fontSize: 13),
-                        ),
-                      ],
-                    ),
-                  ],
+             StreamBuilder<int>(
+  stream: WaterService().getTodayWater(uid),
+  builder: (context, snapshot) {
+    final total = snapshot.data ?? 0;
+
+    const target = 2500;
+
+    final progress = (total / target).clamp(0.0, 1.0);
+
+    return DashboardCard(
+      icon: Icons.water_drop,
+      iconBackground: const Color(0xffB8D8F5),
+      iconColor: const Color(0xff2266A8),
+      title: "Water Reminder",
+
+      value: "${(total / 1000).toStringAsFixed(1)} L",
+
+      subtitle: "Target 2.5 Liter",
+
+      backgroundColor: const Color(0xffDCE8F2),
+      borderColor: const Color(0xffBFD3E3),
+
+      bottomWidget: Column(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(30),
+            child: LinearProgressIndicator(
+              value: progress,
+              minHeight: 8,
+              backgroundColor: Colors.white,
+              valueColor: const AlwaysStoppedAnimation(
+                Color(0xff2C6C72),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "0 L",
+                style: TextStyle(
+                  color: Colors.black54,
+                  fontSize: 13,
                 ),
               ),
+              Text(
+                "2.5 L",
+                style: TextStyle(
+                  color: Colors.black54,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  },
+),
 
-              const SizedBox(height: 16),
+const SizedBox(height: 16),
 
               //================ ACTIVITY ================
               StreamBuilder<List<ActivityModel>>(

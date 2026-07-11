@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+import '../../models/water_model.dart';
+import '../../services/water_service.dart';
 import 'package:flutter/services.dart';
 
 import '../../widgets/container_card.dart';
@@ -13,9 +17,24 @@ class AddDrinkScreen extends StatefulWidget {
 }
 
 class _AddDrinkScreenState extends State<AddDrinkScreen> {
-  int selectedContainer = -1;
-  int selectedDrink = 0;
-  int selectedTemperature = 1;
+ int selectedContainer = -1;
+int selectedDrink = 0;
+int selectedTemperature = 1;
+
+final List<String> drinkTypes = [
+  "Water",
+  "Coffee",
+  "Tea",
+  "Juice",
+  "Milk",
+  "Isotonic",
+];
+
+final List<String> temperatures = [
+  "Cold",
+  "Normal",
+  "Hot",
+];
 
   final amountController = TextEditingController(text: "250");
 
@@ -25,32 +44,45 @@ class _AddDrinkScreenState extends State<AddDrinkScreen> {
     super.dispose();
   }
 
-  void _saveEntry() {
-    final amount = int.tryParse(amountController.text.trim());
+  Future<void> _saveEntry() async {
+  final amount = int.tryParse(amountController.text.trim());
 
-    if (amount == null || amount <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please enter a valid amount")),
-      );
-      return;
-    }
-
-    const drinkTypes = ["Water", "Coffee", "Tea", "Juice", "Milk", "Isotonic"];
-    const temperatures = ["Cold", "Normal", "Hot"];
-
-    final result = {
-      "amount": amount,
-      "drinkType": drinkTypes[selectedDrink],
-      "temperature": temperatures[selectedTemperature],
-    };
-
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text("Drink Saved Successfully")));
-
-    Navigator.pop(context, result);
+  if (amount == null || amount <= 0) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Please enter a valid amount"),
+      ),
+    );
+    return;
   }
 
+  final uid = FirebaseAuth.instance.currentUser!.uid;
+
+  final doc = WaterService()
+      .firestore
+      .collection("water_logs")
+      .doc();
+
+  final water = WaterModel(
+    id: doc.id,
+    uid: uid,
+    amount: amount,
+    drinkType: drinkTypes[selectedDrink],
+    date: DateTime.now(),
+  );
+
+  await WaterService().addWater(water);
+
+  if (!mounted) return;
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+      content: Text("Drink Saved Successfully"),
+    ),
+  );
+
+  Navigator.pop(context);
+}
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
