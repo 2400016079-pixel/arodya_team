@@ -29,6 +29,10 @@ dependencies:
   # chart
   fl_chart: ^1.0.0
 
+   # Upload Foto
+  image_picker: ^1.1.2
+  http: ^1.2.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

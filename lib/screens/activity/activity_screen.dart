@@ -52,6 +52,37 @@ class _ActivityScreenState extends State<ActivityScreen> {
     super.dispose();
   }
 
+  int getEstimatedSteps() {
+  switch (activityList[selectedActivity]) {
+    case "Walking":
+      return duration.round() * 100;
+
+    case "Running":
+      return duration.round() * 160;
+
+    case "Cycling":
+      return duration.round() * 70;
+
+    case "Swimming":
+      return duration.round() * 60;
+
+    case "Yoga":
+      return duration.round() * 30;
+
+    case "Weights":
+      return duration.round() * 40;
+
+    case "HIIT":
+      return duration.round() * 120;
+
+    case "Pilates":
+      return duration.round() * 35;
+
+    default:
+      return 0;
+  }
+}
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -395,14 +426,15 @@ class _ActivityScreenState extends State<ActivityScreen> {
                       return;
                     }
 
-                    final activity = ActivityModel(
-                      activity: activityList[selectedActivity],
-                      duration: duration.round(),
-                      date: selectedDate,
-                      intensity: selectedIntensity,
-                      notes: notesController.text.trim(),
-                      createdAt: Timestamp.now(),
-                    );
+                   final activity = ActivityModel(
+  activity: activityList[selectedActivity],
+  duration: duration.round(),
+  steps: duration.round() * 100,
+  date: selectedDate,
+  intensity: selectedIntensity,
+  notes: notesController.text.trim(),
+  createdAt: Timestamp.now(),
+);
 
                     final error = await ActivityService().addActivity(activity);
 

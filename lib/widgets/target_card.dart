@@ -7,6 +7,7 @@ class TargetCard extends StatelessWidget {
   final String value;
   final String unit;
   final double sliderValue;
+  final ValueChanged<double> onChanged;
   final double min;
   final double max;
   final String minLabel;
@@ -20,6 +21,7 @@ class TargetCard extends StatelessWidget {
     required this.value,
     required this.unit,
     required this.sliderValue,
+    required this.onChanged,
     required this.min,
     required this.max,
     required this.minLabel,
@@ -115,14 +117,13 @@ class TargetCard extends StatelessWidget {
           SizedBox(height: isSmall ? 20 : 30),
 
           Slider(
-            value: sliderValue,
-            min: min,
-            max: max,
-            activeColor: const Color(0xff4F7F5D),
-            inactiveColor: const Color(0xffE5EFE8),
-            onChanged: (_) {},
-          ),
-
+  value: sliderValue,
+  min: min,
+  max: max,
+  activeColor: const Color(0xff4F7F5D),
+  inactiveColor: const Color(0xffE5EFE8),
+  onChanged: onChanged,
+),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

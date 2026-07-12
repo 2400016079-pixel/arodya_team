@@ -25,15 +25,32 @@ class AuthService {
 
       await UserService().createUser(
         UserModel(
-    uid: userCredential.user!.uid,
-    name: name.trim(),
-    email: email.trim(),
-    gender: "",
-    birthDate: "",
-    weight: "",
-    height: "",
-    photoUrl: "",
-  ),
+  uid: userCredential.user!.uid,
+  name: name.trim(),
+  email: email.trim(),
+  gender: "",
+  birthDate: "",
+  weight: "",
+  height: "",
+  photoUrl: "",
+
+  // Target Harian
+  dailyWaterTarget: 2000,
+  dailyStepTarget: 10000,
+  autoRecommendation: true,
+
+  // Notifikasi
+  hydrationReminder: true,
+  reminderInterval: 1,
+  activityReminder: false,
+  quietStart: "22:00",
+  quietEnd: "06:00",
+
+  // Statistik
+  dayStreak: 0,
+  avgDaily: 0,
+  todaySteps: 0,
+),
 );
 
       return null;
@@ -123,15 +140,32 @@ Future<String?> signInWithGoogle() async {
     if (!await UserService().userExists(user.uid)) {
       await UserService().createUser(
         UserModel(
-          uid: user.uid,
-          name: user.displayName ?? "",
-          email: user.email ?? "",
-          gender: "",
-          birthDate: "",
-          weight: "",
-          height: "",
-          photoUrl: user.photoURL ?? "",
-        ),
+  uid: user.uid,
+  name: user.displayName ?? "",
+  email: user.email ?? "",
+  gender: "",
+  birthDate: "",
+  weight: "",
+  height: "",
+  photoUrl: user.photoURL ?? "",
+
+  // Target Harian
+  dailyWaterTarget: 2000,
+  dailyStepTarget: 10000,
+  autoRecommendation: true,
+
+  // Notifikasi
+  hydrationReminder: true,
+  reminderInterval: 1,
+  activityReminder: false,
+  quietStart: "22:00",
+  quietEnd: "06:00",
+
+  // Statistik
+  dayStreak: 0,
+  avgDaily: 0,
+  todaySteps: 0,
+),
       );
     }
 

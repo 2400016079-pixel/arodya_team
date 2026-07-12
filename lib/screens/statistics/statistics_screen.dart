@@ -255,12 +255,16 @@ List<WaterModel> _filterWaters(List<WaterModel> waters) {
               ),
               const SizedBox(height: 6),
               Text(
-                "Your progress this week.",
-                style: TextStyle(
-                  fontSize: isSmall ? 14 : 15,
-                  color: Colors.black54,
-                ),
-              ),
+  selectedTab == 0
+      ? "Your progress this week."
+      : selectedTab == 1
+          ? "Your progress this month."
+          : "Your progress this year.",
+  style: TextStyle(
+    fontSize: isSmall ? 14 : 15,
+    color: Colors.black54,
+  ),
+),
               const SizedBox(height: 20),
 
               //================ TAB =================
@@ -381,91 +385,127 @@ final total = activities.length;
   child: StreamBuilder<List<ActivityModel>>(
     stream: ActivityService().getActivities(),
     builder: (context, snapshot) {
-      final activities = snapshot.data ?? [];
+      final allActivities = snapshot.data ?? [];
+
+      // Filter sesuai tab
+      final activities = _filterActivities(allActivities);
+
+      // Data grafik
+      final spots = _getChartSpots(activities);
+
+      // Max Y otomatis supaya grafik tidak keluar layar
+      double maxY = 50;
+
+      if (spots.isNotEmpty) {
+        final highest = spots
+            .map((e) => e.y)
+            .reduce((a, b) => a > b ? a : b);
+
+        maxY = highest + 20;
+
+        if (maxY < 50) {
+          maxY = 50;
+        }
+      }
 
       return LineChart(
         LineChartData(
           minX: 0,
           maxX: selectedTab == 0
-    ? 6
-    : selectedTab == 1
-        ? 29
-        : 11,
+              ? 6
+              : selectedTab == 1
+                  ? 29
+                  : 11,
+
           minY: 0,
-          maxY: 120,
+          maxY: maxY,
 
           gridData: FlGridData(show: true),
 
           borderData: FlBorderData(show: false),
 
           titlesData: FlTitlesData(
-            rightTitles: AxisTitles(
+            rightTitles: const AxisTitles(
               sideTitles: SideTitles(showTitles: false),
             ),
-            topTitles: AxisTitles(
+            topTitles: const AxisTitles(
               sideTitles: SideTitles(showTitles: false),
             ),
-            leftTitles: AxisTitles(
+            leftTitles: const AxisTitles(
               sideTitles: SideTitles(
-                reservedSize: 28,
                 showTitles: true,
+                reservedSize: 30,
               ),
             ),
             bottomTitles: AxisTitles(
-  sideTitles: SideTitles(
-    showTitles: true,
-    getTitlesWidget: (value, meta) {
-      if (selectedTab == 0) {
-        const days = ["M", "S", "S", "R", "K", "J", "S"];
+              sideTitles: SideTitles(
+                showTitles: true,
+                getTitlesWidget: (value, meta) {
+                  if (selectedTab == 0) {
+                    const days = [
+                      "M",
+                      "S",
+                      "S",
+                      "R",
+                      "K",
+                      "J",
+                      "S",
+                    ];
 
-        return Text(
-          days[value.toInt()],
-          style: const TextStyle(fontSize: 12),
-        );
-      }
+                    return Text(
+                      days[value.toInt()],
+                      style: const TextStyle(fontSize: 12),
+                    );
+                  }
 
-      if (selectedTab == 1) {
-        if (value.toInt() % 5 != 0) {
-          return const SizedBox();
-        }
+                  if (selectedTab == 1) {
+                    if (value.toInt() % 5 != 0) {
+                      return const SizedBox();
+                    }
 
-        return Text(
-          "${value.toInt() + 1}",
-          style: const TextStyle(fontSize: 10),
-        );
-      }
+                    return Text(
+                      "${value.toInt() + 1}",
+                      style: const TextStyle(fontSize: 10),
+                    );
+                  }
 
-      const months = [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "Mei",
-        "Jun",
-        "Jul",
-        "Agu",
-        "Sep",
-        "Okt",
-        "Nov",
-        "Des",
-      ];
+                  const months = [
+                    "Jan",
+                    "Feb",
+                    "Mar",
+                    "Apr",
+                    "Mei",
+                    "Jun",
+                    "Jul",
+                    "Agu",
+                    "Sep",
+                    "Okt",
+                    "Nov",
+                    "Des",
+                  ];
 
-      return Text(
-        months[value.toInt()],
-        style: const TextStyle(fontSize: 10),
-      );
-    },
-  ),
-),
+                  return Text(
+                    months[value.toInt()],
+                    style: const TextStyle(fontSize: 10),
+                  );
+                },
+              ),
+            ),
           ),
 
           lineBarsData: [
             LineChartBarData(
-             spots: _getChartSpots(activities),
-              isCurved: true,
+              spots: spots,
+
+              // UBAH INI
+              isCurved: false,
+
               color: const Color(0xff35694A),
               barWidth: 4,
-              dotData: FlDotData(show: true),
+
+              dotData: const FlDotData(show: true),
+
+              belowBarData: BarAreaData(show: false),
             ),
           ],
         ),

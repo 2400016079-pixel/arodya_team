@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../../widgets/notification_card.dart';
 
+import '../../services/auth_service.dart';
+import '../../services/user_service.dart';
+
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
 
@@ -13,9 +16,69 @@ class NotificationScreen extends StatefulWidget {
 class _NotificationScreenState
     extends State<NotificationScreen> {
 
+      @override
+void initState() {
+  super.initState();
+  loadNotification();
+}
+
+Future<void> loadNotification() async {
+  final uid = AuthService().currentUser!.uid;
+
+  final user = await UserService()
+      .getUser(uid)
+      .first;
+
+  setState(() {
+    hydrationReminder = user.hydrationReminder;
+    activityReminder = user.activityReminder;
+    selectedInterval = user.reminderInterval;
+    quietStart = user.quietStart;
+    quietEnd = user.quietEnd;
+  });
+}
+
+Future<void> pickStartTime() async {
+  final time = await showTimePicker(
+    context: context,
+    initialTime: TimeOfDay(
+      hour: int.parse(quietStart.split(":")[0]),
+      minute: int.parse(quietStart.split(":")[1]),
+    ),
+  );
+
+  if (time != null) {
+    setState(() {
+      quietStart =
+          "${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}";
+    });
+  }
+}
+
+Future<void> pickEndTime() async {
+  final time = await showTimePicker(
+    context: context,
+    initialTime: TimeOfDay(
+      hour: int.parse(quietEnd.split(":")[0]),
+      minute: int.parse(quietEnd.split(":")[1]),
+    ),
+  );
+
+  if (time != null) {
+    setState(() {
+      quietEnd =
+          "${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}";
+    });
+  }
+}
+
   bool hydrationReminder = true;
+  bool activityReminder = false;
 
   int selectedInterval = 1;
+
+  String quietStart = "22:00";
+  String quietEnd = "06:00";
 
   @override
   Widget build(BuildContext context) {
@@ -165,145 +228,119 @@ class _NotificationScreenState
 
                 children: [
 
-                  Row(
+  Row(
 
-                    children: [
+    children: [
 
-                      Expanded(
+      Expanded(
 
-                        child: Column(
+        child: Column(
 
-                          crossAxisAlignment:
-                              CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
 
-                          children: [
+          children: [
 
-                            const Text(
-                              "Mulai",
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-
-                            const SizedBox(height:10),
-
-                            Container(
-
-                              padding:
-                                  const EdgeInsets.symmetric(
-                                horizontal:18,
-                                vertical:16,
-                              ),
-
-                              decoration: BoxDecoration(
-
-                                color:
-                                    const Color(0xffECEDE8),
-
-                                borderRadius:
-                                    BorderRadius.circular(16),
-
-                              ),
-
-                              child: const Row(
-
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-
-                                children: [
-
-                                  Text(
-                                    "10:00 PM",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                    ),
-                                  ),
-
-                                  Icon(
-                                    Icons.access_time,
-                                    color: Colors.grey,
-                                  ),
-
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      const SizedBox(width:20),
-
-                      Expanded(
-
-                        child: Column(
-
-                          crossAxisAlignment:
-                              CrossAxisAlignment.start,
-
-                          children: [
-
-                            const Text(
-                              "Selesai",
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-
-                            const SizedBox(height:10),
-
-                            Container(
-
-                              padding:
-                                  const EdgeInsets.symmetric(
-                                horizontal:18,
-                                vertical:16,
-                              ),
-
-                              decoration: BoxDecoration(
-
-                                color:
-                                    const Color(0xffECEDE8),
-
-                                borderRadius:
-                                    BorderRadius.circular(16),
-
-                              ),
-
-                              child: const Row(
-
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-
-                                children: [
-
-                                  Text(
-                                    "06:00 AM",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                    ),
-                                  ),
-
-                                  Icon(
-                                    Icons.access_time,
-                                    color: Colors.grey,
-                                  ),
-
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                    ],
-                  ),
-
-                ],
+            const Text(
+              "Mulai",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
               ),
             ),
 
+            const SizedBox(height: 10),
+
+            GestureDetector(
+  onTap: pickStartTime,
+  child: Container(
+    padding: const EdgeInsets.symmetric(
+      horizontal: 18,
+      vertical: 16,
+    ),
+    decoration: BoxDecoration(
+      color: const Color(0xffECEDE8),
+      borderRadius: BorderRadius.circular(16),
+    ),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          quietStart,
+          style: const TextStyle(
+            fontSize: 18,
+          ),
+        ),
+        const Icon(
+          Icons.access_time,
+          color: Colors.grey,
+        ),
+      ],
+    ),
+  ),
+),
+          ],
+        ),
+      ),
+
+      const SizedBox(width: 20),
+
+      Expanded(
+
+        child: Column(
+
+          crossAxisAlignment: CrossAxisAlignment.start,
+
+          children: [
+
+            const Text(
+              "Selesai",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+           GestureDetector(
+  onTap: pickEndTime,
+  child: Container(
+    padding: const EdgeInsets.symmetric(
+      horizontal: 18,
+      vertical: 16,
+    ),
+    decoration: BoxDecoration(
+      color: const Color(0xffECEDE8),
+      borderRadius: BorderRadius.circular(16),
+    ),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          quietEnd,
+          style: const TextStyle(
+            fontSize: 18,
+          ),
+        ),
+        const Icon(
+          Icons.access_time,
+          color: Colors.grey,
+        ),
+      ],
+    ),
+  ),
+),
+
+          ],
+        ),
+      ),
+
+    ],
+  ),
+
+],
+              ),
+                        ),
             const SizedBox(height:30),
                         NotificationCard(
 
@@ -331,18 +368,16 @@ class _NotificationScreenState
                     ),
                   ),
 
-                  Switch(
-
-                    value: false,
-
-                    activeColor: Colors.white,
-
-                    activeTrackColor:
-                        const Color(0xff4F7F5D),
-
-                    onChanged: (value) {},
-
-                  ),
+                 Switch(
+  value: activityReminder,
+  activeColor: Colors.white,
+  activeTrackColor: const Color(0xff4F7F5D),
+  onChanged: (value) {
+    setState(() {
+      activityReminder = value;
+    });
+  },
+),
 
                 ],
               ),
@@ -357,19 +392,29 @@ class _NotificationScreenState
 
               child: ElevatedButton(
 
-                onPressed: () {
+                onPressed: () async {
 
-                  ScaffoldMessenger.of(context).showSnackBar(
+  final uid = AuthService().currentUser!.uid;
 
-                    const SnackBar(
-                      content: Text(
-                        "Pengaturan notifikasi berhasil disimpan",
-                      ),
-                    ),
+  await UserService().updateNotification(
+    uid: uid,
+    hydrationReminder: hydrationReminder,
+    reminderInterval: selectedInterval,
+    activityReminder: activityReminder,
+    quietStart: quietStart,
+    quietEnd: quietEnd,
+  );
 
-                  );
+  if (!mounted) return;
 
-                },
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+      content: Text(
+        "Pengaturan notifikasi berhasil disimpan",
+      ),
+    ),
+  );
+},
 
                 style: ElevatedButton.styleFrom(
 

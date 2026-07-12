@@ -263,65 +263,80 @@ class DashboardScreen extends StatelessWidget {
               const SizedBox(height: 26),
 
               //================ WATER REMINDER ================
-             StreamBuilder<int>(
-  stream: WaterService().getTodayWater(uid),
-  builder: (context, snapshot) {
-    final total = snapshot.data ?? 0;
+             StreamBuilder<UserModel>(
+  stream: UserService().getUser(uid),
+  builder: (context, userSnapshot) {
+    if (!userSnapshot.hasData) {
+      return const SizedBox();
+    }
 
-    const target = 2500;
+    final profile = userSnapshot.data!;
 
-    final progress = (total / target).clamp(0.0, 1.0);
+    return StreamBuilder<int>(
+      stream: WaterService().getTodayWater(uid),
+      builder: (context, waterSnapshot) {
+        final total = waterSnapshot.data ?? 0;
 
-    return DashboardCard(
-      icon: Icons.water_drop,
-      iconBackground: const Color(0xffB8D8F5),
-      iconColor: const Color(0xff2266A8),
-      title: "Water Reminder",
+        final target = profile.dailyWaterTarget;
 
-      value: "${(total / 1000).toStringAsFixed(1)} L",
+        final progress = target == 0
+            ? 0.0
+            : (total / target).clamp(0.0, 1.0);
 
-      subtitle: "Target 2.5 Liter",
+        return DashboardCard(
+          icon: Icons.water_drop,
+          iconBackground: const Color(0xffB8D8F5),
+          iconColor: const Color(0xff2266A8),
+          title: "Water Reminder",
 
-      backgroundColor: const Color(0xffDCE8F2),
-      borderColor: const Color(0xffBFD3E3),
+          value: "${(total / 1000).toStringAsFixed(1)} L",
 
-      bottomWidget: Column(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(30),
-            child: LinearProgressIndicator(
-              value: progress,
-              minHeight: 8,
-              backgroundColor: Colors.white,
-              valueColor: const AlwaysStoppedAnimation(
-                Color(0xff2C6C72),
-              ),
-            ),
-          ),
+          subtitle:
+              "Target ${(target / 1000).toStringAsFixed(1)} Liter",
 
-          const SizedBox(height: 10),
+          backgroundColor: const Color(0xffDCE8F2),
+          borderColor: const Color(0xffBFD3E3),
 
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          bottomWidget: Column(
             children: [
-              Text(
-                "0 L",
-                style: TextStyle(
-                  color: Colors.black54,
-                  fontSize: 13,
+              ClipRRect(
+                borderRadius: BorderRadius.circular(30),
+                child: LinearProgressIndicator(
+                  value: progress,
+                  minHeight: 8,
+                  backgroundColor: Colors.white,
+                  valueColor: const AlwaysStoppedAnimation(
+                    Color(0xff2C6C72),
+                  ),
                 ),
               ),
-              Text(
-                "2.5 L",
-                style: TextStyle(
-                  color: Colors.black54,
-                  fontSize: 13,
-                ),
+
+              const SizedBox(height: 10),
+
+              Row(
+                mainAxisAlignment:
+                    MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "0 L",
+                    style: TextStyle(
+                      color: Colors.black54,
+                      fontSize: 13,
+                    ),
+                  ),
+                  Text(
+                    "${(target / 1000).toStringAsFixed(1)} L",
+                    style: const TextStyle(
+                      color: Colors.black54,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
+        );
+      },
     );
   },
 ),

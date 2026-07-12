@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 
+import 'dart:io';
+
+import 'package:image_picker/image_picker.dart';
+
+import '../../services/cloudinary_service.dart';
+
 import '../../models/user_model.dart';
 import '../../services/user_service.dart';
 import '../../services/auth_service.dart';
@@ -27,6 +33,7 @@ final oldPasswordController = TextEditingController();
 final newPasswordController = TextEditingController();
 final confirmPasswordController = TextEditingController();
 final birthDateController = TextEditingController();
+final ImagePicker picker = ImagePicker();
 
 String gender = "";
 String birthDate = "";
@@ -88,15 +95,29 @@ Future<void> saveProfile() async {
 
     await UserService().updateUser(
       UserModel(
-        uid: uid,
-        name: nameController.text.trim(),
-        email: emailController.text.trim(),
-        gender: gender,
-        birthDate: birthDateController.text.trim(),
-        weight: weightController.text.trim(),
-        height: heightController.text.trim(),
-        photoUrl: user?.photoUrl ?? "",
-      ),
+  uid: uid,
+  name: nameController.text.trim(),
+  email: emailController.text.trim(),
+  gender: gender,
+  birthDate: birthDateController.text.trim(),
+  weight: weightController.text.trim(),
+  height: heightController.text.trim(),
+  photoUrl: user?.photoUrl ?? "",
+
+  dailyWaterTarget: user?.dailyWaterTarget ?? 2000,
+  dailyStepTarget: user?.dailyStepTarget ?? 10000,
+  autoRecommendation: user?.autoRecommendation ?? true,
+
+  hydrationReminder: user?.hydrationReminder ?? true,
+  reminderInterval: user?.reminderInterval ?? 1,
+  activityReminder: user?.activityReminder ?? false,
+  quietStart: user?.quietStart ?? "22:00",
+  quietEnd: user?.quietEnd ?? "06:00",
+
+  dayStreak: user?.dayStreak ?? 0,
+  avgDaily: user?.avgDaily ?? 0,
+  todaySteps: user?.todaySteps ?? 0,
+)
     );
 
     print("Berhasil update Firestore");
@@ -114,6 +135,71 @@ Future<void> saveProfile() async {
   } catch (e) {
     print("ERROR: $e");
   }
+}
+
+Future<void> pickImage() async {
+  final XFile? image = await picker.pickImage(
+    source: ImageSource.gallery,
+    imageQuality: 70,
+  );
+
+  if (image == null) return;
+
+  final imageUrl = await CloudinaryService().uploadImage(
+    File(image.path),
+  );
+
+  if (imageUrl == null) {
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Upload foto gagal"),
+      ),
+    );
+    return;
+  }
+
+  final uid = AuthService().currentUser!.uid;
+
+  final updatedUser = UserModel(
+  uid: uid,
+  name: nameController.text,
+  email: emailController.text,
+  gender: gender,
+  birthDate: birthDateController.text,
+  weight: weightController.text,
+  height: heightController.text,
+  photoUrl: imageUrl,
+
+  dailyWaterTarget: user?.dailyWaterTarget ?? 2000,
+  dailyStepTarget: user?.dailyStepTarget ?? 10000,
+  autoRecommendation: user?.autoRecommendation ?? true,
+
+  hydrationReminder: user?.hydrationReminder ?? true,
+  reminderInterval: user?.reminderInterval ?? 1,
+  activityReminder: user?.activityReminder ?? false,
+  quietStart: user?.quietStart ?? "22:00",
+  quietEnd: user?.quietEnd ?? "06:00",
+
+  dayStreak: user?.dayStreak ?? 0,
+  avgDaily: user?.avgDaily ?? 0,
+  todaySteps: user?.todaySteps ?? 0,
+);
+
+  await UserService().updateUser(updatedUser);
+
+  setState(() {
+    user = updatedUser;
+  });
+
+  if (!mounted) return;
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+      content: Text("Foto profil berhasil diperbarui"),
+    ),
+  );
 }
 
 Future<void> _showChangeEmailDialog() async {
@@ -312,42 +398,42 @@ Widget build(BuildContext context) {
 
             const SizedBox(height:20),
 
-            //================ FOTO =================
+           //================ FOTO =================
 
-            Stack(
+Stack(
+  children: [
 
-              children: [
+    CircleAvatar(
+      radius: 70,
+      backgroundImage:
+          (user != null && user!.photoUrl.isNotEmpty)
+              ? NetworkImage(user!.photoUrl)
+              : const AssetImage(
+                  "assets/images/profile.jpg",
+                ) as ImageProvider,
+    ),
 
-                const CircleAvatar(
-                  radius: 70,
-                  backgroundImage:
-                      AssetImage(
-                    "assets/images/profile.jpg",
-                  ),
-                ),
+    Positioned(
+      right: 0,
+      bottom: 0,
 
-                Positioned(
+      child: GestureDetector(
+        onTap: pickImage,
+        child: const CircleAvatar(
+          radius: 22,
+          backgroundColor: Color(0xff4F7F5D),
+          child: Icon(
+            Icons.edit,
+            color: Colors.white,
+          ),
+        ),
+      ),
+    ),
 
-                  right: 0,
-                  bottom: 0,
+  ],
+),
 
-                  child: CircleAvatar(
-
-                    radius: 22,
-                    backgroundColor:
-                        const Color(0xff4F7F5D),
-
-                    child: const Icon(
-                      Icons.edit,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height:35),
-
+const SizedBox(height:35),
             //================ INFORMASI =================
 
             Container(

@@ -4,6 +4,7 @@ class ActivityModel {
   final String? id;
   final String activity;
   final int duration;
+  final int steps;
   final DateTime date;
   final String intensity;
   final String notes;
@@ -13,6 +14,7 @@ class ActivityModel {
     this.id,
     required this.activity,
     required this.duration,
+    required this.steps,
     required this.date,
     required this.intensity,
     required this.notes,
@@ -24,6 +26,7 @@ class ActivityModel {
     return {
       "activity": activity,
       "duration": duration,
+      "steps": steps,
       "date": Timestamp.fromDate(date),
       "intensity": intensity,
       "notes": notes,
@@ -38,6 +41,7 @@ class ActivityModel {
       id: documentId,
       activity: map["activity"] ?? "",
       duration: map["duration"] ?? 0,
+      steps: map["steps"] ?? 0,
       date: (map["date"] as Timestamp).toDate(),
       intensity: map["intensity"] ?? "",
       notes: map["notes"] ?? "",

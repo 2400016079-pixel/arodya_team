@@ -7,7 +7,8 @@ import '../../models/user_model.dart';
 import '../../services/user_service.dart';
 
 import 'edit_profile_screen.dart';
-
+import '../settings/daily_target_screen.dart';
+import '../settings/notification_screen.dart';
 import '../mood/mood_screen.dart';
 import '../../widgets/bottom_navbar.dart';
 import '../../widgets/profile_setting_tile.dart';
@@ -16,9 +17,40 @@ import '../dashboard/dashboard_screen.dart';
 import '../activity/activity_screen.dart';
 import '../water/water_screen.dart';
 import '../statistics/statistics_screen.dart';
+import '../../services/activity_service.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+
+  int todaySteps = 0;
+  double averageWater = 0;
+  int dayStreak = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    loadStats();
+  }
+
+  Future<void> loadStats() async {
+    final steps = await ActivityService().getTodaySteps();
+    final avgWater = await ActivityService().getAverageWater();
+    final streak = await ActivityService().getDayStreak();
+
+    if (!mounted) return;
+
+    setState(() {
+      todaySteps = steps;
+      averageWater = avgWater;
+      dayStreak = streak;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -107,34 +139,7 @@ class ProfileScreen extends StatelessWidget {
               ),
               const SizedBox(height: 28),
 
-              //================ PROFILE =================
-              Stack(
-                children: [
-                  CircleAvatar(
-                    radius: avatarRadius + 5,
-                    backgroundColor: const Color(0xffE5EFE8),
-                    child: CircleAvatar(
-                      radius: avatarRadius,
-                      backgroundImage:
-                          const AssetImage("assets/images/profile.jpg"),
-                    ),
-                  ),
-                  Positioned(
-                    right: 0,
-                    bottom: 4,
-                    child: CircleAvatar(
-                      radius: 18,
-                      backgroundColor: const Color(0xff4F7F5D),
-                      child: const Icon(
-                        Icons.edit,
-                        color: Colors.white,
-                        size: 18,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 18),
+  
 
 StreamBuilder<UserModel>(
   stream: UserService().getUser(uid),
@@ -165,6 +170,39 @@ StreamBuilder<UserModel>(
 
     return Column(
       children: [
+        Stack(
+  children: [
+    CircleAvatar(
+      radius: avatarRadius + 5,
+      backgroundColor: const Color(0xffE5EFE8),
+      child: CircleAvatar(
+        radius: avatarRadius,
+        backgroundImage: user.photoUrl.isNotEmpty
+            ? NetworkImage(user.photoUrl)
+            : const AssetImage(
+                "assets/images/profile.jpg",
+              ) as ImageProvider,
+      ),
+    ),
+
+    Positioned(
+      right: 0,
+      bottom: 4,
+      child: CircleAvatar(
+        radius: 18,
+        backgroundColor: const Color(0xff4F7F5D),
+        child: const Icon(
+          Icons.edit,
+          color: Colors.white,
+          size: 18,
+        ),
+      ),
+    ),
+  ],
+),
+
+const SizedBox(height: 18),
+
         Text(
           user.name,
           style: const TextStyle(
@@ -198,48 +236,54 @@ StreamBuilder<UserModel>(
         ),
 
         const SizedBox(height: 28),
+
+        //================ STATS =================
+Row(
+  children: [
+    Expanded(
+      child: ProfileStatCard(
+        icon: Icons.local_fire_department,
+        iconColor: const Color(0xff4F7F5D),
+        value: dayStreak.toString(),
+        label: "DAY STREAK",
+      ),
+    ),
+    const SizedBox(width: 14),
+    Expanded(
+      child: ProfileStatCard(
+        icon: Icons.water_drop,
+        iconColor: Colors.blue,
+        value: "${averageWater.toStringAsFixed(1)} L",
+        label: "AVG DAILY",
+      ),
+    ),
+  ],
+),
+
+const SizedBox(height: 16),
+
+ProfileStatCard(
+  icon: Icons.show_chart,
+  iconColor: const Color(0xff35694A),
+  value: todaySteps.toString(),
+  label: "STEPS TODAY",
+  bottomWidget: ClipRRect(
+    borderRadius: BorderRadius.circular(30),
+    child: LinearProgressIndicator(
+      value: user.dailyStepTarget == 0
+    ? 0
+    : (todaySteps / user.dailyStepTarget).clamp(0.0, 1.0),
+      minHeight: 6,
+    ),
+  ),
+),
+
+const SizedBox(height: 30),
       ],
     );
   },
 ),
-              //================ STATS =================
-              Row(
-                children: [
-                  Expanded(
-                    child: ProfileStatCard(
-                      icon: Icons.local_fire_department,
-                      iconColor: const Color(0xff4F7F5D),
-                      value: "14",
-                      label: "DAY STREAK",
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: ProfileStatCard(
-                      icon: Icons.water_drop,
-                      iconColor: Colors.blue,
-                      value: "2.4L",
-                      label: "AVG DAILY",
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              ProfileStatCard(
-                icon: Icons.show_chart,
-                iconColor: const Color(0xff35694A),
-                value: "12,450",
-                label: "STEPS TODAY",
-                bottomWidget: ClipRRect(
-                  borderRadius: BorderRadius.circular(30),
-                  child: const LinearProgressIndicator(
-                    value: .78,
-                    minHeight: 6,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 30),
-
+             
               //================ ACCOUNT SETTINGS =================
               Align(
                 alignment: Alignment.centerLeft,
@@ -328,22 +372,36 @@ StreamBuilder<UserModel>(
                   ],
                 ),
                 child: Column(
-                  children: [
-                    ProfileSettingTile(
-                      icon: Icons.track_changes,
-                      title: "Target Harian",
-                      subtitle: "Steps, Water, Mindfulness",
-                      onTap: () {},
-                    ),
-                    const Divider(),
-                    ProfileSettingTile(
-                      icon: Icons.notifications_none,
-                      title: "Notifikasi",
-                      subtitle: "Reminders & Updates",
-                      onTap: () {},
-                    ),
-                  ],
-                ),
+  children: [
+    ProfileSettingTile(
+      icon: Icons.track_changes,
+      title: "Target Harian",
+      subtitle: "Steps, Water, Mindfulness",
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const DailyTargetScreen(),
+          ),
+        );
+      },
+    ),
+    const Divider(),
+    ProfileSettingTile(
+      icon: Icons.notifications_none,
+      title: "Notifikasi",
+      subtitle: "Reminders & Updates",
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const NotificationScreen(),
+          ),
+        );
+      },
+    ),
+  ],
+),
               ),
               const SizedBox(height: 40),
               // Konektivitas section (Privasi & Izin Data, Perangkat

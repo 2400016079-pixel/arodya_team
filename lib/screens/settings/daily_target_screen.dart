@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../widgets/target_card.dart';
+import '../../services/auth_service.dart';
+import '../../services/user_service.dart';
 
 class DailyTargetScreen extends StatefulWidget {
   const DailyTargetScreen({super.key});
@@ -13,7 +14,33 @@ class DailyTargetScreen extends StatefulWidget {
 class _DailyTargetScreenState
     extends State<DailyTargetScreen> {
 
+      final waterController = TextEditingController();
+      final stepController = TextEditingController();
+
   bool autoRecommendation = true;
+
+  @override
+void initState() {
+  super.initState();
+  loadTarget();
+}
+
+Future<void> loadTarget() async {
+  final uid = AuthService().currentUser!.uid;
+
+  final user = await UserService()
+      .getUser(uid)
+      .first;
+
+  setState(() {
+   waterController.text =
+    user.dailyWaterTarget.toString();
+
+stepController.text =
+    user.dailyStepTarget.toString();
+    autoRecommendation = user.autoRecommendation;
+  });
+}
 
   @override
   Widget build(BuildContext context) {
@@ -57,54 +84,83 @@ class _DailyTargetScreenState
 
           children: [
 
-            TargetCard(
+           Container(
+  padding: const EdgeInsets.all(20),
+  decoration: BoxDecoration(
+    color: Colors.white,
+    borderRadius: BorderRadius.circular(24),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withOpacity(.05),
+        blurRadius: 12,
+      ),
+    ],
+  ),
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
 
-              icon: Icons.water_drop,
+      const Text(
+        "Target Hidrasi",
+        style: TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
 
-              iconColor: Colors.blue,
+      const SizedBox(height: 20),
 
-              title: "Target Hidrasi",
-
-              value: "2000",
-
-              unit: "ml",
-
-              sliderValue: 2,
-
-              min: 1,
-
-              max: 4,
-
-              minLabel: "1L",
-
-              maxLabel: "4L",
-
-            ),
+      TextField(
+        controller: waterController,
+        keyboardType: TextInputType.number,
+        decoration: const InputDecoration(
+          labelText: "Target Air (ml)",
+          border: OutlineInputBorder(),
+          suffixText: "ml",
+        ),
+      ),
+    ],
+  ),
+),
 
             const SizedBox(height:30),
-                        TargetCard(
+                        Container(
+  padding: const EdgeInsets.all(20),
+  decoration: BoxDecoration(
+    color: Colors.white,
+    borderRadius: BorderRadius.circular(24),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withOpacity(.05),
+        blurRadius: 12,
+      ),
+    ],
+  ),
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const Text(
+        "Target Langkah",
+        style: TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
 
-              icon: Icons.directions_walk,
+      const SizedBox(height: 20),
 
-              iconColor: const Color(0xff4F7F5D),
-
-              title: "Target Langkah",
-
-              value: "10000",
-
-              unit: "langkah",
-
-              sliderValue: 10,
-
-              min: 3,
-
-              max: 20,
-
-              minLabel: "3k",
-
-              maxLabel: "20k",
-
-            ),
+      TextField(
+        controller: stepController,
+        keyboardType: TextInputType.number,
+        decoration: const InputDecoration(
+          labelText: "Target Langkah",
+          border: OutlineInputBorder(),
+          suffixText: "langkah",
+        ),
+      ),
+    ],
+  ),
+),
 
             const SizedBox(height: 35),
 
@@ -194,43 +250,54 @@ class _DailyTargetScreenState
 
               child: ElevatedButton(
 
-                onPressed: () {
+  onPressed: () async {
+  final uid = AuthService().currentUser!.uid;
 
-                  ScaffoldMessenger.of(context).showSnackBar(
+  final water =
+      int.tryParse(waterController.text) ?? 2000;
 
-                    const SnackBar(
-                      content: Text(
-                        "Target berhasil diperbarui",
-                      ),
-                    ),
+  final step =
+      int.tryParse(stepController.text) ?? 10000;
 
-                  );
+  await UserService().updateTarget(
+    uid: uid,
+    waterTarget: water,
+    stepTarget: step,
+    autoRecommendation: autoRecommendation,
+  );
 
-                },
+  if (!mounted) return;
 
-                style: ElevatedButton.styleFrom(
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+      content: Text("Target berhasil diperbarui"),
+    ),
+  );
+},
 
-                  backgroundColor: const Color(0xff35694A),
+  style: ElevatedButton.styleFrom(
 
-                  elevation: 5,
+    backgroundColor: const Color(0xff35694A),
 
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(35),
-                  ),
+    elevation: 5,
 
-                ),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(35),
+    ),
 
-                child: const Text(
+  ),
 
-                  "Simpan Perubahan",
+  child: const Text(
 
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
+    "Simpan Perubahan",
+
+    style: TextStyle(
+      color: Colors.white,
+      fontSize: 22,
+      fontWeight: FontWeight.bold,
+    ),
+  ),
+),
             ),
 
             const SizedBox(height: 30),
