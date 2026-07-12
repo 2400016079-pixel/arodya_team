@@ -28,6 +28,18 @@ class UserService {
         .update(user.toMap());
   }
 
+  Future<void> updateEmail(
+  String uid,
+  String email,
+) async {
+  await firestore
+      .collection("users")
+      .doc(uid)
+      .update({
+    "email": email,
+  });
+}
+
   Stream<UserModel> getUser(String uid) {
   return firestore
       .collection("users")

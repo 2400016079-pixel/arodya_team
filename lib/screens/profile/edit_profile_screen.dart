@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:firebase_auth/firebase_auth.dart';
+
 import '../../models/user_model.dart';
 import '../../services/user_service.dart';
 import '../../services/auth_service.dart';
@@ -38,7 +40,12 @@ void initState() {
 }
 
 Future<void> loadUser() async {
-  final uid = AuthService().currentUser!.uid;
+  final firebaseUser = AuthService().currentUser!;
+
+  // Ambil email terbaru dari Firebase Auth
+  await firebaseUser.reload();
+
+  final uid = firebaseUser.uid;
 
   print("UID LOGIN = $uid");
 
@@ -46,19 +53,32 @@ Future<void> loadUser() async {
       .getUser(uid)
       .first;
 
-  user = data;
+  // Sinkronkan email Firestore jika berbeda
+  if (firebaseUser.email != null &&
+      firebaseUser.email != data.email) {
+    await UserService().updateEmail(
+      uid,
+      firebaseUser.email!,
+    );
+  }
 
-  nameController.text = data.name;
-  emailController.text = data.email;
-  weightController.text = data.weight;
-  heightController.text = data.height;
-  birthDateController.text = data.birthDate;
+  // Ambil ulang data setelah update
+  final newData = await UserService()
+      .getUser(uid)
+      .first;
+
+  user = newData;
+
+  nameController.text = newData.name;
+  emailController.text = newData.email;
+  weightController.text = newData.weight;
+  heightController.text = newData.height;
+  birthDateController.text = newData.birthDate;
 
   setState(() {
-    gender = data.gender;
+    gender = newData.gender;
   });
 }
-
 Future<void> saveProfile() async {
   try {
     print("Tombol Simpan ditekan");
@@ -94,6 +114,142 @@ Future<void> saveProfile() async {
   } catch (e) {
     print("ERROR: $e");
   }
+}
+
+Future<void> _showChangeEmailDialog() async {
+  final controller = TextEditingController(
+    text: emailController.text,
+  );
+
+  showDialog(
+    context: context,
+    builder: (_) => AlertDialog(
+      title: const Text("Ganti Email"),
+      content: TextField(
+        controller: controller,
+        decoration: const InputDecoration(
+          labelText: "Email Baru",
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text("Batal"),
+        ),
+       ElevatedButton(
+  onPressed: () async {
+    final result = await AuthService().changeEmail(
+      controller.text.trim(),
+    );
+
+    if (result == null) {
+      emailController.text = controller.text.trim();
+
+      Navigator.pop(context);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "Link verifikasi telah dikirim ke email baru",
+          ),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result),
+        ),
+      );
+    }
+  },
+  child: const Text("Simpan"),
+)
+      ],
+    ),
+  );
+}
+
+
+Future<void> _showChangePasswordDialog() async {
+  oldPasswordController.clear();
+  newPasswordController.clear();
+  confirmPasswordController.clear();
+
+  showDialog(
+    context: context,
+    builder: (_) => AlertDialog(
+      title: const Text("Ganti Password"),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: oldPasswordController,
+              obscureText: true,
+              decoration: const InputDecoration(
+                labelText: "Password Lama",
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: newPasswordController,
+              obscureText: true,
+              decoration: const InputDecoration(
+                labelText: "Password Baru",
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: confirmPasswordController,
+              obscureText: true,
+              decoration: const InputDecoration(
+                labelText: "Konfirmasi Password",
+              ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text("Batal"),
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            if (newPasswordController.text !=
+                confirmPasswordController.text) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("Konfirmasi password tidak sama"),
+                ),
+              );
+              return;
+            }
+
+            final result = await AuthService().changePassword(
+              currentPassword: oldPasswordController.text,
+              newPassword: newPasswordController.text,
+            );
+
+            if (result == null) {
+              Navigator.pop(context);
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("Password berhasil diubah"),
+                ),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(result)),
+              );
+            }
+          },
+          child: const Text("Simpan"),
+        ),
+      ],
+    ),
+  );
 }
 
 @override
@@ -242,45 +398,60 @@ ProfileTextField(
 ),
 
                   Row(
+  children: [
+    Expanded(
+      child: ProfileTextField(
+        controller: emailController,
+        label: "Email",
+        hint: "Email",
+        readOnly: true,
+        suffix: const Icon(Icons.lock_outline),
+      ),
+    ),
+    const SizedBox(width: 12),
+    SizedBox(
+      height: 58,
+      child: ElevatedButton(
+        onPressed: _showChangeEmailDialog,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.grey.shade300,
+          elevation: 0,
+        ),
+        child: const Text(
+          "Ubah",
+          style: TextStyle(
+            color: Colors.black87,
+          ),
+        ),
+      ),
+    ),
+  ],
+),
 
-                    children: [
+const SizedBox(height: 20),
 
-                      Expanded(
-  child: ProfileTextField(
-    controller: emailController,
-    label: "Email",
-    hint: "Email",
-    readOnly: true,
-    suffix: const Icon(Icons.lock_outline),
+ListTile(
+  contentPadding: EdgeInsets.zero,
+  leading: const Icon(
+    Icons.lock_outline,
+    color: Color(0xff35694A),
+  ),
+  title: const Text("Password"),
+  subtitle: const Text("••••••••"),
+  trailing: ElevatedButton(
+    onPressed: _showChangePasswordDialog,
+    style: ElevatedButton.styleFrom(
+      backgroundColor: Colors.grey.shade300,
+      elevation: 0,
+    ),
+    child: const Text(
+      "Ubah",
+      style: TextStyle(
+        color: Colors.black87,
+      ),
+    ),
   ),
 ),
-                      const SizedBox(width:12),
-
-                      SizedBox(
-
-                        height:58,
-
-                        child: ElevatedButton(
-
-                          onPressed: () {},
-
-                          style:
-                              ElevatedButton.styleFrom(
-                            backgroundColor:
-                                Colors.grey.shade300,
-                            elevation:0,
-                          ),
-
-                          child: const Text(
-                            "Ubah",
-                            style: TextStyle(
-                              color: Colors.black87,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
 
                 ],
               ),
@@ -402,62 +573,77 @@ ProfileTextField(
             ),
 
             const SizedBox(height:30),
-                        //================ UBAH PASSWORD =================
+                        const SizedBox(height: 30),
 
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(24),
+Container(
+  width: double.infinity,
+  padding: const EdgeInsets.all(24),
+  decoration: BoxDecoration(
+    color: Colors.white,
+    borderRadius: BorderRadius.circular(30),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withOpacity(.05),
+        blurRadius: 15,
+        offset: const Offset(0, 8),
+      ),
+    ],
+  ),
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
 
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(30),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(.05),
-                    blurRadius: 15,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
+      Text(
+        "KEAMANAN AKUN",
+        style: TextStyle(
+          color: Colors.grey.shade700,
+          fontWeight: FontWeight.bold,
+          fontSize: 22,
+        ),
+      ),
 
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+      const SizedBox(height: 25),
 
-                  Text(
-                    "UBAH PASSWORD",
-                    style: TextStyle(
-                      color: Colors.grey.shade700,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 22,
-                    ),
-                  ),
+      ListTile(
+        contentPadding: EdgeInsets.zero,
+        leading: const Icon(
+          Icons.email_outlined,
+          color: Color(0xff35694A),
+        ),
+        title: const Text("Email"),
+        subtitle: Text(
+          emailController.text,
+        ),
+        trailing: ElevatedButton(
+          onPressed: () {
+            _showChangeEmailDialog();
+          },
+          child: const Text("Ubah"),
+        ),
+      ),
 
-                  const SizedBox(height: 30),
+      const Divider(),
 
-                  ProfileTextField(
-  controller: oldPasswordController,
-  label: "Kata Sandi Lama",
-  hint: "••••••••",
+      ListTile(
+        contentPadding: EdgeInsets.zero,
+        leading: const Icon(
+          Icons.lock_outline,
+          color: Color(0xff35694A),
+        ),
+        title: const Text("Password"),
+        subtitle: const Text("••••••••"),
+        trailing: ElevatedButton(
+          onPressed: () {
+            _showChangePasswordDialog();
+          },
+          child: const Text("Ubah"),
+        ),
+      ),
+    ],
+  ),
 ),
 
-                  ProfileTextField(
-  controller: newPasswordController,
-  label: "Kata Sandi Baru",
-  hint: "••••••••",
-),
-
-                  ProfileTextField(
-  controller: confirmPasswordController,
-  label: "Konfirmasi Kata Sandi Baru",
-  hint: "••••••••",
-),
-
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 40),
+const SizedBox(height: 40),
 
             SizedBox(
               width: double.infinity,
@@ -474,6 +660,8 @@ ProfileTextField(
                   ),
                   elevation: 4,
                 ),
+
+                
 
                 child: const Text(
                   "Simpan Perubahan",

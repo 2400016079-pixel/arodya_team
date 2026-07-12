@@ -171,6 +171,75 @@ Future<String?> signInWithGoogle() async {
     }
   }
 
+
+Future<String?> changeEmail(String newEmail) async {
+  try {
+    final user = _auth.currentUser!;
+
+    await user.verifyBeforeUpdateEmail(
+      newEmail.trim(),
+    );
+
+    return null;
+  } on FirebaseAuthException catch (e) {
+    switch (e.code) {
+      case "email-already-in-use":
+        return "Email sudah digunakan";
+
+      case "invalid-email":
+        return "Format email tidak valid";
+
+      case "requires-recent-login":
+        return "Silakan login ulang terlebih dahulu";
+
+      default:
+        return e.message ?? "Terjadi kesalahan";
+    }
+  } catch (e) {
+    return e.toString();
+  }
+}
+Future<String?> changePassword({
+  required String currentPassword,
+  required String newPassword,
+}) async {
+  try {
+    final user = _auth.currentUser!;
+
+    final credential = EmailAuthProvider.credential(
+      email: user.email!,
+      password: currentPassword,
+    );
+
+    await user.reauthenticateWithCredential(
+      credential,
+    );
+
+    await user.updatePassword(
+      newPassword,
+    );
+
+    return null;
+  } on FirebaseAuthException catch (e) {
+    switch (e.code) {
+      case "wrong-password":
+      case "invalid-credential":
+        return "Password lama salah";
+
+      case "weak-password":
+        return "Password minimal 6 karakter";
+
+      case "requires-recent-login":
+        return "Silakan login ulang";
+
+      default:
+        return e.message;
+    }
+  } catch (e) {
+    return e.toString();
+  }
+}
+
   // ================= LOGOUT =================
  Future<void> logout() async {
   await GoogleSignIn().signOut();
